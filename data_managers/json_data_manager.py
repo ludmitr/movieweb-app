@@ -1,4 +1,4 @@
-from data_manager_interface import DataManagerInterface
+from .data_manager_interface import DataManagerInterface
 import os
 import json
 
@@ -46,15 +46,53 @@ class JSONDataManager(DataManagerInterface):
 
 
     def get_all_users(self) -> list:
+        """Loads users data from json file"""
         with open(self.file_name, 'r') as file:
             data = json.load(file)
         return data
 
     def get_user_movies(self, user_id):
+        """Will return list with movies if user id found. otherwise None"""
         all_users = self.get_all_users()
         found_user = next((user for user in all_users if user['id'] == user_id), None)
         if found_user:
             return found_user['movies']
 
 
+    def add_user(self, new_user_name: str):
+        """Adding user to the json file db. User name must be a string and not empty"""
+        if not isinstance(new_user_name, str):
+            raise TypeError("User name need to be a string")
+        if not new_user_name:
+            raise ValueError("User name cannot be empty name")
+        users = self.get_all_users()
+        unique_id = self._get_unique_user_id(users)
+        new_user = {
+            "id": unique_id,
+            "name": new_user_name,
+            "movies": []
+        }
+        users.append(new_user)
+        self._save_data(users)
 
+
+    def delete_user(self, user_id:int):
+        users = self.get_all_users()
+        user_to_delete = next((user for user in users if user['id'] == user_id), None)
+        if user_to_delete:
+            users.remove(user_to_delete)
+
+        self._save_data(users)
+
+    def _save_data(self, users):
+        """Saves the users data to a file in JSON format"""
+        with open(self.file_name, "w") as file:
+            json.dump(users, file)
+
+    def _get_unique_user_id(self, users: list) -> int:
+        """finds maximum id number, adds to it 1 and return the value"""
+        if not users:
+            return 1
+        unique_id = (max(users, key=lambda user: user['id']))['id'] + 1
+
+        return unique_id
