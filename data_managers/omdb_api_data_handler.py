@@ -18,7 +18,8 @@ class MovieAPIHandler():
         try:
             response = requests.get(self._url, params=params)
             response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes
-
+            if response.json()["Response"] == 'False':
+                return None
             processed_movie_data = self._transform_movie_data(response.json())
             return processed_movie_data
         except requests.exceptions.RequestException as e:
