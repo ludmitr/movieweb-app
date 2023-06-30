@@ -1,16 +1,20 @@
 from flask import Flask, request, render_template, redirect, url_for
 from data_managers.json_data_manager import JSONDataManager
+from data_managers.omdb_api_data_handler import MovieAPIHandler
+
+import logging
+import os
+
+
+# if not os.path.exists('logs'):
+#     os.makedirs('logs')
+#
+# logging.basicConfig(filename='logs/app.log', level=logging.INFO)
+
 app = Flask(__name__)
-data_manager = JSONDataManager('movies_test_2')
+
 
 #------- ROUTES -------------------------------------------------------------
-
-
-# @app.route('/')
-# def home():
-#     return "Welcome to MovieWeb App!"
-#     #This will be the home page of our application. You have the creative
-#     # liberty to design this as a simple welcome screen or a more elaborate dashboard.
 
 
 @app.route('/')
@@ -24,7 +28,7 @@ def user_movies():
     user_name = request.form.get('user_name')
     movies = data_manager.get_user_movies(user_id)
 
-    return render_template('user_movies.html', user_movies=movies, user_name=user_name)
+    return render_template('user_movies.html', user_movies=movies, user_name=user_name, user_id=user_id)
 
 
 @app.route('/add_user')
@@ -37,10 +41,22 @@ def add_user():
     #  This route will present a form that enables the addition of a new user to our MovieWeb App.
 
 
-@app.route('/users/<user_id>')
-def add_movie(user_id):
-    pass
-    # This route will display a form to add a new movie to a user’s list of favorite movies.
+@app.route('/add_movie', methods=['POST'])
+def add_movie():
+    movie_name_to_search: str = request.form.get('search_name')
+    user_id = int(request.form.get('user_id'))
+    if movie_name_to_search:
+        movie_to_add = movies_api_handler.get_movie_by_title(movie_name_to_search)
+        if movie_to_add:
+            data_manager.add_movie_to_user(user_id, movie_to_add)
+    user = data_manager.get_user_by_id(user_id)
+    return render_template('user_movies.html', user_movies=user['movies'], user_name=user['name'], user_id=user['id'])
+
+
+
+
+
+
 
 @app.route("/delete_user/<int:user_id>")
 def delete_user(user_id: int):
@@ -55,11 +71,13 @@ def update_movie(user_id, movie_id):
     #This route will display a form allowing for the updating of details of a
     # specific movie in a user’s list.
 
+
 @app.route('/users/<user_id>/edit_movie/<movie_id>')
 def edit_movie(user_id, movie_id):
     pass
     # This route will show a form allowing the modification of a specific
     # movie in a user’s favorite movie list.
+
 
 @app.route('/users/<user_id>/delete_movie/<movie_id>')
 def delete_movie(user_id, movie_id):
@@ -69,5 +87,8 @@ def delete_movie(user_id, movie_id):
 
 
 if __name__ == '__main__':
+    # logging.basicConfig(level=logging.INFO)
+    data_manager = JSONDataManager('movies_test_2')
+    movies_api_handler = MovieAPIHandler()
     app.run(port=5000, debug=True)
 
