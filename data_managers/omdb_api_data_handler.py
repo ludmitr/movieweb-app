@@ -10,21 +10,25 @@ class MovieAPIHandler():
         self._logger = logging.getLogger(__name__)
 
     def get_movie_by_title(self, title: str) -> dict:
-        """Search for movie by title. Returns dict with data of found movie"""
+        """Search for movie by title. Returns dict with data of found movie
+        and None if didn't find movie"""
         params = {
             'apikey': self._api_key,
             't': title
         }
         try:
+            # get the search result, transform the data to match app needs and return the data
             response = requests.get(self._url, params=params)
             response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes
-            if response.json()["Response"] == 'False':
-                return None
-            processed_movie_data = self._transform_movie_data(response.json())
-            return processed_movie_data
+            if response.json()["Response"] == 'True':
+                processed_movie_data = self._transform_movie_data(response.json())
+                return processed_movie_data
+
         except requests.exceptions.RequestException as e:
-            self._logger.error(f"An error occurred: {str(e)}")
-            return None
+            # self._logger.error(f"An error occurred: {str(e)}")
+            pass
+        # case of exceptions or movie didn't found
+        return None
 
     def _transform_movie_data(self, api_data: dict) -> dict:
         """Transform api data to match the data used in app"""
