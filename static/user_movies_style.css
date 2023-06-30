@@ -6,8 +6,9 @@ body {
 
 .list-movies-title {
   padding: 10px 0;
-  background: #17a2b8;
-  color: white;
+  color: #17a2b8;
+  border: 1px solid #17a2b8;
+  box-shadow: 0 7px 12px rgba(0, 0, 0, 0.2);
   text-align: center;
   font-size: 16pt;
 }
