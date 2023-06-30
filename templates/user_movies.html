@@ -8,11 +8,25 @@
 <body>
 <div class="list-movies-title">
     <h1>{{ user_name }} Movies Library</h1>
+    <form action="{{ url_for('add_movie') }}" method="POST">
+        <input type="text" name="search_name" placeholder="Enter movie name">
+        <button type="submit">Search</button>
+        <input type="hidden" name="user_id" value="{{ user_id }}">
+    </form>
 </div>
 <div>
     <ol class="movie-grid">
-        {% for user in users %}
-            <li>{{ user }}</li>
+        {% for movie in user_movies %}
+        <li>
+            <div class="movie">
+                <a href="{{ movie['imdb_link'] }}" target="_blank">
+                <img class='movie-poster' src="{{ movie['image_link'] }}" />
+                </a>
+                <div class='imdb'><em>IMDb:</em>{{ movie['rating'] }}</div>
+                <div class='movie-title'>{{ movie['name'] }}</div>
+                <div class='movie-year'>{{ movie['year'] }}</div>
+            </div>
+        </li>
         {% endfor %}
     </ol>
 </div>
