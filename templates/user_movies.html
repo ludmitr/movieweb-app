@@ -1,22 +1,22 @@
 <html>
 <head>
-    <title>{{ user_name }} Movie App</title>
+    <title>Movie App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='user_movies_style.css') }}">
     <style>
     </style>
 </head>
 <body>
 <div class="list-movies-title">
-    <h1>{{ user_name }} Movies Library</h1>
+    <h1>{{ user['name'] }} Movies Library</h1>
     <form action="{{ url_for('add_movie') }}" method="POST">
         <input type="text" name="search_name" placeholder="Enter movie name">
         <button type="submit">Search</button>
-        <input type="hidden" name="user_id" value="{{ user_id }}">
+        <input type="hidden" name="user_id" value="{{ user['id'] }}">
     </form>
 </div>
 <div>
     <ol class="movie-grid">
-        {% for movie in user_movies %}
+        {% for movie in user["movies"] %}
         <li>
             <div class="movie">
                 <a href="{{ movie['imdb_link'] }}" target="_blank">
@@ -25,6 +25,16 @@
                 <div class='imdb'><em>IMDb:</em>{{ movie['rating'] }}</div>
                 <div class='movie-title'>{{ movie['name'] }}</div>
                 <div class='movie-year'>{{ movie['year'] }}</div>
+            </div>
+            <div class='buttons'>
+                <form action="{{ url_for('edit_movie', user_id=user['id'],movie_id=movie['id']) }}" method="POST">
+                    <button class="button-8" role="button">Edit</button>
+                    <input type="hidden" name="movie_id" value="{{ movie['id'] }}">
+                </form>
+                <form action="{{ url_for('delete_movie', user_id=user['id'],movie_id=movie['id']) }}" method="POST">
+                    <button class="button-8" role="button">Delete</button>
+                    <input type="hidden" name="movie_id" value="{{ movie['id'] }}">
+                </form>
             </div>
         </li>
         {% endfor %}
