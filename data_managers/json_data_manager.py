@@ -3,13 +3,30 @@ import os
 import json
 
 class JSONDataManager(DataManagerInterface):
-    def __init__(self, filename: str):
-        """
-        Initialize the JSONDataManager class
+    """
+    This class manages a list of users and their movies. Each user is represented
+    as a dictionary with the following structure:
 
-        Args:
-           filename (str): The name of the file without extension
-        """
+    {
+        "id": <unique id of user, an integer>,
+        "name": <name of user, a string>,
+        "movies": [<list of movies, each movie is a dictionary>]
+    }
+
+    Each movie in the 'movies' list is represented as a dictionary with the
+    following structure:
+
+    {
+        "id": <unique id of movie, a string>,
+        "title": <title of movie, a string>,
+        "year": <year of movie, an integer>,
+        ...
+        <additional movie properties>
+    }
+
+    The list of users is stored in a JSON file.
+    """
+    def __init__(self, filename: str):
         if not isinstance(filename, str) or not filename:
             raise ValueError('Filename should be a non-empty string')
 
@@ -77,12 +94,13 @@ class JSONDataManager(DataManagerInterface):
 
 
     def delete_user(self, user_id:int):
-        users = self.get_all_users()
-        user_to_delete = next((user for user in users if user['id'] == user_id), None)
-        if user_to_delete:
-            users.remove(user_to_delete)
+        all_users = self.get_all_users()
 
-        self._save_data(users)
+        # finding user by id and if it found - deleting it
+        user_to_delete = next((user for user in all_users if user['id'] == user_id), None)
+        if user_to_delete:
+            all_users.remove(user_to_delete)
+            self._save_data(all_users)
 
     def add_movie_to_user(self, user_id: int, movie_to_add: dict):
         """
@@ -104,10 +122,21 @@ class JSONDataManager(DataManagerInterface):
 
         # adding movie if user doesn't have it in
         if not movie_with_same_id:
-            user["movies"].append(
-                movie_to_add)  # append to existing movie list
+            user["movies"].append(movie_to_add)
 
         self._save_data(users)
+
+    def delete_movie_of_user(self, user_id: int, movie_id: str):
+        users = self.get_all_users()
+
+        # finding user and movie by id, and deleting movie. save data if movie deleted
+        user = next((user for user in users if user['id'] == user_id),None)
+        if user:
+            movies_of_user: list = user['movies']
+            movie_to_delete = next((movie for movie in movies_of_user if movie['id'] == movie_id), None)
+            if movie_to_delete:
+                movies_of_user.remove(movie_to_delete)
+                self._save_data(users)
 
     def _save_data(self, users):
         """Saves the users data to a file in JSON format"""
@@ -127,6 +156,8 @@ class JSONDataManager(DataManagerInterface):
         found_user = next((user for user in users if user['id'] == user_id), None)
         if found_user:
             return found_user
+
+
 
 class UserNotFoundError(Exception):
     pass
