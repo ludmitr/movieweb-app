@@ -52,3 +52,6 @@ class DataManagerInterface(ABC):
     @abstractmethod
     def get_user_by_id(self, user_id: int) -> dict:
         pass
+
+    def delete_movie_of_user(self, user_id: int, movie_id: str):
+        pass
