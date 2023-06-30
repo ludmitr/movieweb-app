@@ -22,16 +22,15 @@ def list_users():
     users = data_manager.get_all_users()
     return render_template('users.html', users=users)
 
-@app.route('/user_movies', methods=["POST"])
+@app.route('/user_movies')
 def user_movies():
-    user_id = int(request.form.get('user_id'))
-    user_name = request.form.get('user_name')
-    movies = data_manager.get_user_movies(user_id)
+    user_id = request.args.get('user_id', type=int)
+    user = data_manager.get_user_by_id(user_id)
 
-    return render_template('user_movies.html', user_movies=movies, user_name=user_name, user_id=user_id)
+    return render_template('user_movies.html', user=user)
 
 
-@app.route('/add_user')
+@app.route('/add_user')  # should be post
 def add_user():
     user_name = request.args.get('user_name')
     if user_name:
@@ -50,40 +49,29 @@ def add_movie():
         if movie_to_add:
             data_manager.add_movie_to_user(user_id, movie_to_add)
     user = data_manager.get_user_by_id(user_id)
-    return render_template('user_movies.html', user_movies=user['movies'], user_name=user['name'], user_id=user['id'])
+
+    return redirect(url_for('user_movies', user_id=user_id))
 
 
-
-
-
-
-
-@app.route("/delete_user/<int:user_id>")
+@app.route("/delete_user/<int:user_id>", methods=["POST"])
 def delete_user(user_id: int):
     data_manager.delete_user(user_id)
 
-    return redirect(url_for('list_users'))
+    return redirect(url_for('user_movies'))
 
 
-@app.route('/users/<user_id>/update_movie/<movie_id>')
-def update_movie(user_id, movie_id):
-    pass
-    #This route will display a form allowing for the updating of details of a
-    # specific movie in a user’s list.
 
-
-@app.route('/users/<user_id>/edit_movie/<movie_id>')
+@app.route('/users/<user_id>/edit_movie/<movie_id>', methods=['POST'])
 def edit_movie(user_id, movie_id):
     pass
     # This route will show a form allowing the modification of a specific
     # movie in a user’s favorite movie list.
 
 
-@app.route('/users/<user_id>/delete_movie/<movie_id>')
+@app.route('/users/<int:user_id>/delete_movie/<movie_id>', methods=["POST"])
 def delete_movie(user_id, movie_id):
-    pass
-    # : Upon visiting this route, a specific movie will be removed from a
-    # user’s favorite movie list.
+    data_manager.delete_movie_of_user(user_id, movie_id)
+    return redirect(url_for('user_movies', user_id=user_id))
 
 
 if __name__ == '__main__':
