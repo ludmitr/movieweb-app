@@ -84,6 +84,31 @@ class JSONDataManager(DataManagerInterface):
 
         self._save_data(users)
 
+    def add_movie_to_user(self, user_id: int, movie_to_add: dict):
+        """
+        Adds a new movie to a user's movie list if it doesn't exist.
+        Raises a UserNotFoundError if the user with passed id does not exist.
+        """
+        users = self.get_all_users()
+
+        # getting user by user_id
+        user = next((user for user in users if user['id'] == user_id), None)
+
+        # If user not found, raise UserNotFoundError
+        if user is None:
+            raise UserNotFoundError(f"User with ID {user_id} not found")
+
+        # looking for movie with same id
+        movie_with_same_id = next((movie for movie in user["movies"]
+                                   if movie['id'] == movie_to_add['id']), None)
+
+        # adding movie if user doesn't have it in
+        if not movie_with_same_id:
+            user["movies"].append(
+                movie_to_add)  # append to existing movie list
+
+        self._save_data(users)
+
     def _save_data(self, users):
         """Saves the users data to a file in JSON format"""
         with open(self.file_name, "w") as file:
@@ -96,3 +121,12 @@ class JSONDataManager(DataManagerInterface):
         unique_id = (max(users, key=lambda user: user['id']))['id'] + 1
 
         return unique_id
+
+    def get_user_by_id(self, user_id: int) -> dict:
+        users = self.get_all_users()
+        found_user = next((user for user in users if user['id'] == user_id), None)
+        if found_user:
+            return found_user
+
+class UserNotFoundError(Exception):
+    pass
