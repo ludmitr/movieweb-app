@@ -5,12 +5,14 @@ body {
 }
 
 .list-movies-title {
-  padding: 10px 0;
-  color: #17a2b8;
-  border: 1px solid #17a2b8;
-  box-shadow: 0 7px 12px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  font-size: 16pt;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    color: #17a2b8;
+    border: 1px solid #17a2b8;
+    box-shadow: 0 7px 12px rgba(0, 0, 0, 0.2);
+    font-size: 16pt;
 }
 
 .movie-grid {
@@ -69,4 +71,79 @@ body {
 }
 .imdb em{
  font-weight: bold
+}
+
+.button-8 {
+    padding: 5px 10px;
+    margin: 5px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.button-8:hover {
+    opacity: 0.8;
+}
+
+.buttons {
+    display: flex;
+    justify-content: flex-star;
+}
+
+/* Edit button styling */
+form[action*='edit_movie'] .button-8 {
+    background-color: #DEB522;
+    color: white;
+}
+
+/* Delete button styling */
+form[action*='delete_movie'] .button-8 {
+    background-color: #f44336; /* Red */
+    color: white;
+}
+
+li {
+    border: 1px solid #17a2b8;
+}
+.home-button {
+    padding: 10px 20px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 3px;
+    background-color: rgba(23, 162, 184, 0.5);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.home-button:hover {
+    background-color: rgba(23, 162, 184);
+}
+
+.home-form{
+    display: inline
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.home-form-container {
+    position: absolute;
+    left: 15px;
+    top: 5px;
+}
+
+.centered-content {
+    text-align: center;
 }
