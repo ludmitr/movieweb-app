@@ -55,3 +55,9 @@ class DataManagerInterface(ABC):
 
     def delete_movie_of_user(self, user_id: int, movie_id: str):
         pass
+
+    def get_user_movie(self, user_id: int, movie_id: str):
+        pass
+
+    def update_movie_of_user(self, user_id: int, movie_id: str, movie_for_update: dict):
+        pass
