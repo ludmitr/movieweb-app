@@ -1,8 +1,14 @@
 import logging
+import os
 from flask import Flask, request, render_template, redirect, url_for, abort
 from data_managers.json_data_manager import JSONDataManager
 from data_managers.omdb_api_data_handler import MovieAPIHandler
 
+
+# set up log file path for logs
+log_dir = 'logs'
+log_file = 'app.log'
+log_path = os.path.join(log_dir, log_file)
 
 # Create or get the logger
 logger = logging.getLogger(__name__)  # __name__ resolves to the name of the module, class, or function that called this logging setup
@@ -10,7 +16,10 @@ logger = logging.getLogger(__name__)  # __name__ resolves to the name of the mod
 # set log level
 logger.setLevel(logging.ERROR)
 
-handler = logging.FileHandler('logs/app.log')  # set the log handler
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+handler = logging.FileHandler(log_path)  # set the log handler
 handler.setLevel(logging.ERROR)  # set the handler level
 
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # create a logging format
