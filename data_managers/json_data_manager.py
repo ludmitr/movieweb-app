@@ -2,6 +2,7 @@ from .data_manager_interface import DataManagerInterface
 import os
 import json
 
+
 class JSONDataManager(DataManagerInterface):
     """
     This class manages a list of users and their movies. Each user is represented
@@ -26,6 +27,7 @@ class JSONDataManager(DataManagerInterface):
 
     The list of users is stored in a JSON file.
     """
+
     def __init__(self, filename: str):
         if not isinstance(filename, str) or not filename:
             raise ValueError('Filename should be a non-empty string')
@@ -33,14 +35,9 @@ class JSONDataManager(DataManagerInterface):
         self._data_folder = "data"
         self.file_name = filename
 
-
     @property
     def file_name(self) -> str:
-        """
-        Get the full path of the file
-
-        Returns: (str) Full path of the file
-        """
+        """Get the full path of the file"""
         return os.path.join(self._data_folder, self._file_name + ".json")
 
     @file_name.setter
@@ -61,7 +58,6 @@ class JSONDataManager(DataManagerInterface):
             with open(full_path, "w") as file:
                 json.dump([], file)
 
-
     def get_all_users(self) -> list:
         """Loads users data from json file"""
         with open(self.file_name, 'r') as file:
@@ -71,10 +67,10 @@ class JSONDataManager(DataManagerInterface):
     def get_user_movies(self, user_id):
         """Will return list with movies if user id found. otherwise None"""
         all_users = self.get_all_users()
-        found_user = next((user for user in all_users if user['id'] == user_id), None)
+        found_user = next(
+            (user for user in all_users if user['id'] == user_id), None)
         if found_user:
             return found_user['movies']
-
 
     def add_user(self, new_user_name: str):
         """Adding user to the json file db. User name must be a string and not empty"""
@@ -92,12 +88,12 @@ class JSONDataManager(DataManagerInterface):
         users.append(new_user)
         self._save_data(users)
 
-
-    def delete_user(self, user_id:int):
+    def delete_user(self, user_id: int):
         all_users = self.get_all_users()
 
         # finding user by id and if it found - deleting it
-        user_to_delete = next((user for user in all_users if user['id'] == user_id), None)
+        user_to_delete = next(
+            (user for user in all_users if user['id'] == user_id), None)
         if user_to_delete:
             all_users.remove(user_to_delete)
             self._save_data(all_users)
@@ -127,16 +123,49 @@ class JSONDataManager(DataManagerInterface):
         self._save_data(users)
 
     def delete_movie_of_user(self, user_id: int, movie_id: str):
+        """Removes a specific movie from a user's movie list based on provided user_id and movie_id."""
         users = self.get_all_users()
 
         # finding user and movie by id, and deleting movie. save data if movie deleted
-        user = next((user for user in users if user['id'] == user_id),None)
+        user = next((user for user in users if user['id'] == user_id), None)
         if user:
             movies_of_user: list = user['movies']
-            movie_to_delete = next((movie for movie in movies_of_user if movie['id'] == movie_id), None)
+            movie_to_delete = next(
+                (movie for movie in movies_of_user if movie['id'] == movie_id),
+                None)
             if movie_to_delete:
                 movies_of_user.remove(movie_to_delete)
                 self._save_data(users)
+
+    def get_user_movie(self, user_id: int, movie_id: str):
+        """Get the user's specific movie by its ID. return None if user or movies
+        with that id doesn't exist"""
+        user = self.get_user_by_id(user_id)
+        if user:
+            found_movie = next((movie for movie in user['movies']
+                                if movie_id == movie['id']), None)
+            if found_movie:
+                return found_movie
+
+    def get_user_by_id(self, user_id: int) -> dict:
+        """Retrieves a user's information based on the provided user_id.
+        Returns None if there is no user with that id"""
+        users = self.get_all_users()
+        found_user = next((user for user in users if user['id'] == user_id),
+                          None)
+        if found_user:
+            return found_user
+
+    def update_movie_of_user(self, user_id: int, movie_id: str, movie_data_to_update: dict):
+        all_users = self.get_all_users()
+        user = next((user for user in all_users if user['id'] == user_id), None)
+        if user:
+            movie: dict = next((movie for movie in user['movies'] if movie['id'] == movie_id), None)
+            if movie:
+                movie.update(movie_data_to_update)
+            self._save_data(all_users)
+
+    # -------------- inner logic methods--------------------------------
 
     def _save_data(self, users):
         """Saves the users data to a file in JSON format"""
@@ -150,13 +179,6 @@ class JSONDataManager(DataManagerInterface):
         unique_id = (max(users, key=lambda user: user['id']))['id'] + 1
 
         return unique_id
-
-    def get_user_by_id(self, user_id: int) -> dict:
-        users = self.get_all_users()
-        found_user = next((user for user in users if user['id'] == user_id), None)
-        if found_user:
-            return found_user
-
 
 
 class UserNotFoundError(Exception):
