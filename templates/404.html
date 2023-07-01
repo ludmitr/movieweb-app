@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>404 Not Found</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container text-center">
+        <div class="jumbotron mt-5">
+            <h1 class="display-4">Oops, 404 Error!</h1>
+            <p class="lead">The page you are looking for does not exist. It might have been moved or deleted.</p>
+            <hr class="my-4">
+            <p>Let's get you back home.</p>
+            <a class="btn btn-primary btn-lg" href="{{ url_for('list_users') }}" role="button">Go Home</a>
+        </div>
+    </div>
+</body>
+</html>
