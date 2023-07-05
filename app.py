@@ -69,6 +69,11 @@ def add_user():
             json_data_manager.add_user(user_name)
 
         return redirect(url_for('list_users'))
+
+    # handling empty string passed or name already exist
+    except ValueError as ve:
+        return redirect(url_for('list_users'))
+
     except Exception as e:
         logger.exception("Exception occurred")
         abort(404)
