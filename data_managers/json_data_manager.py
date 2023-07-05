@@ -135,14 +135,20 @@ class JSONDataManager(DataManagerInterface):
 
         # finding user and movie by id, and deleting movie. save data if movie deleted
         user = next((user for user in users if user['id'] == user_id), None)
-        if user:
-            movies_of_user: list = user['movies']
-            movie_to_delete = next(
-                (movie for movie in movies_of_user if movie['id'] == movie_id),
-                None)
-            if movie_to_delete:
-                movies_of_user.remove(movie_to_delete)
-                self._save_data(users)
+        if user is None:
+            raise ValueError(f"User with id {user_id} does not exist")
+
+        movies_of_user: list = user['movies']
+        movie_to_delete = next(
+            (movie for movie in movies_of_user if movie['id'] == movie_id),
+            None)
+
+        if movie_to_delete is None:
+            raise ValueError(
+                f"Movie with id {movie_id} does not exist for user {user_id}")
+
+        movies_of_user.remove(movie_to_delete)
+        self._save_data(users)
 
     def get_user_movie(self, user_id: int, movie_id: str):
         """Get the user's specific movie by its ID. return None if user or movies
