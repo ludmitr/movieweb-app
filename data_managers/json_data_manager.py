@@ -78,10 +78,17 @@ class JSONDataManager(DataManagerInterface):
             raise TypeError("User name need to be a string")
         if not new_user_name:
             raise ValueError("User name cannot be empty name")
+
         users = self.get_all_users()
-        unique_id = self._get_unique_user_id(users)
+
+        # Check if the user name already exists
+        for user in users:
+            if user['name'] == new_user_name:
+                raise ValueError(
+                    f"User name '{new_user_name}' already exists. Please choose a different name.")
+
         new_user = {
-            "id": unique_id,
+            "id": self._get_unique_user_id(users),
             "name": new_user_name,
             "movies": []
         }
