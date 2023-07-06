@@ -1,6 +1,7 @@
 from .data_manager_interface import DataManagerInterface
 import os
 import json
+import bcrypt
 
 
 class JSONDataManager(DataManagerInterface):
@@ -72,8 +73,12 @@ class JSONDataManager(DataManagerInterface):
         if found_user:
             return found_user['movies']
 
-    def add_user(self, new_user_name: str):
-        """Adding user to the json file db. User name must be a string and not empty"""
+    def add_user(self, new_user_name: str, password=None,
+                 avatar_filename=None):
+        """
+        Adds a user to the json file db. User name must be a string and not empty.
+        Passwords are hashed and salted before being stored.
+        """
         if not isinstance(new_user_name, str):
             raise TypeError("User name need to be a string")
         if not new_user_name:
@@ -92,6 +97,16 @@ class JSONDataManager(DataManagerInterface):
             "name": new_user_name,
             "movies": []
         }
+
+        if password:
+            password_hash = bcrypt.hashpw(password.encode('utf-8'),
+                                          bcrypt.gensalt())
+            new_user["password"] = password_hash.decode(
+                'utf-8')  # store hash as string
+
+        if avatar_filename:
+            new_user["avatar"] = avatar_filename  # store avatar filename
+
         users.append(new_user)
         self._save_data(users)
 
@@ -198,6 +213,43 @@ class JSONDataManager(DataManagerInterface):
 
         # Save all user data back to file.
         self._save_data(all_users)
+
+    def get_all_public_users(self):
+        """Returns a list of all public users. Public users are those who don't have a password."""
+        all_users = self.get_all_users()
+        return [user for user in all_users if 'password' not in user]
+
+    def get_all_registered_users(self):
+        """Returns a list of all registered users. Registered users are those who have a password."""
+        all_users = self.get_all_users()
+        return [user for user in all_users if 'password' in user]
+
+        """Check a user's password."""
+        user = self.get_user_by_name(user_name)
+        if user and 'password' in user:
+            stored_password_hash = user['password'].encode(
+                'utf-8')  # get the stored password hash
+            password_to_check_hash = bcrypt.hashpw(
+                password_to_check.encode('utf-8'), stored_password_hash)
+            return stored_password_hash == password_to_check_hash
+
+        return False  # return False for users without a password, or if the user doesn't exist
+
+    def is_password_valid(self, user_name: str, password_to_check: str) -> bool:
+        """
+           Checks the validity of a user's password by comparing a provided
+           password with the stored hash of the user's actual password.
+        """
+        user = self.get_user_by_name(user_name)
+        if user and 'password' in user:
+            stored_password_hash = user['password'].encode(
+                'utf-8')  # get the stored password hash
+            password_to_check_hash = bcrypt.hashpw(
+                password_to_check.encode('utf-8'), stored_password_hash)
+            return stored_password_hash == password_to_check_hash
+
+        return False  # return False for users without a password, or if the user doesn't exist
+
     # -------------- inner logic methods--------------------------------
 
     def _save_data(self, users):

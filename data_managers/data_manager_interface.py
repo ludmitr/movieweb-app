@@ -61,3 +61,9 @@ class DataManagerInterface(ABC):
 
     def update_movie_of_user(self, user_id: int, movie_id: str, movie_for_update: dict):
         pass
+
+    def get_all_public_users(self):
+        pass
+
+    def get_all_registered_users(self):
+        pass
