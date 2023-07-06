@@ -169,15 +169,35 @@ class JSONDataManager(DataManagerInterface):
         if found_user:
             return found_user
 
-    def update_movie_of_user(self, user_id: int, movie_id: str, movie_data_to_update: dict):
+    def update_movie_of_user(self, user_id: int, movie_id: str,
+                             movie_data_to_update: dict):
+        """
+        This method is used to update a specific movie of a specific user
+        based on the user_id and movie_id provided.
+        """
         all_users = self.get_all_users()
-        user = next((user for user in all_users if user['id'] == user_id), None)
-        if user:
-            movie: dict = next((movie for movie in user['movies'] if movie['id'] == movie_id), None)
-            if movie:
-                movie.update(movie_data_to_update)
-            self._save_data(all_users)
+        # Find the user whose movie we want to update
+        user = next((user for user in all_users if user['id'] == user_id),
+                    None)
 
+        if not user:
+            raise ValueError(f"No user found with ID {user_id}")
+
+        # Find the movie we want to update
+        movie: dict = next(
+            (movie for movie in user['movies'] if movie['id'] == movie_id),
+            None)
+
+        # If the movie doesn't exist - raise an error
+        if not movie:
+            raise ValueError(
+                f"No movie found with ID {movie_id} for user {user_id}")
+
+        # If the movie exists - update
+        movie.update(movie_data_to_update)
+
+        # Save all user data back to file.
+        self._save_data(all_users)
     # -------------- inner logic methods--------------------------------
 
     def _save_data(self, users):
