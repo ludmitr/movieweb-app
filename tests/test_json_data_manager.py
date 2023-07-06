@@ -71,8 +71,11 @@ def test_delete_movie_of_unexisted_user(json_manager):
         json_manager.delete_movie_of_user(1, 'fdfd33refd')
 
 def test_delete_movie_that_does_not_exist(json_manager):
-    error_message = 'User with id 1 does not exist'
+    error_message = 'Movie with id fdfd33refd does not exist for user 1'
+    movie_id_doesnt_exist = 'fdfd33refd'
+    json_manager.add_user("bob")
+
     with pytest.raises(ValueError, match=error_message):
-        json_manager.delete_movie_of_user(1, 'fdfd33refd')
+        json_manager.delete_movie_of_user(1, movie_id_doesnt_exist)
 
 pytest.main()
