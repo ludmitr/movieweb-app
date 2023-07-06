@@ -1,8 +1,9 @@
 import logging
 import os
-from flask import Flask, request, render_template, redirect, url_for, abort
+from flask import Flask, request, render_template, redirect, url_for, abort, session
 from data_managers.json_data_manager import JSONDataManager
 from data_managers.omdb_api_data_handler import MovieAPIHandler
+
 
 json_data_manager = JSONDataManager('movies_test_2')
 movies_api_handler = MovieAPIHandler()
@@ -134,6 +135,25 @@ def delete_movie(user_id, movie_id):
     except Exception as e:
         logger.exception("Exception occurred")
         abort(404)
+
+@app.route('/new-user', methods=['GET','POST'])
+def user_register():
+    if request.method == 'GET':
+        return render_template('register_new_user.html')
+    if request.method == 'POST':
+        return "working on page"
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        # verify the username and password with the database here.
+        # if the user exists and the password is correct:
+        session['username'] = username
+        return redirect(url_for('list_users'))
+
 
 @app.errorhandler(404)
 def page_not_found(e):
