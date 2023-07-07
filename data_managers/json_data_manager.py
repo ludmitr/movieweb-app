@@ -73,39 +73,40 @@ class JSONDataManager(DataManagerInterface):
         if found_user:
             return found_user['movies']
 
-    def add_user(self, new_user_name: str, password=None,
-                 avatar_filename=None):
+    def add_user(self, new_user_name: str, password=None, avatar_filename=None):
         """
         Adds a user to the json file db. User name must be a string and not empty.
         Passwords are hashed and salted before being stored.
         """
+        # validate passed arguments
         if not isinstance(new_user_name, str):
             raise TypeError("User name need to be a string")
         if not new_user_name:
             raise ValueError("User name cannot be empty name")
+        if password and len(password) < 6:
+            raise ValueError("Password length must be at least 6 characters")
 
         users = self.get_all_users()
-
         # Check if the user name already exists
         for user in users:
             if user['name'] == new_user_name:
                 raise ValueError(
                     f"User name '{new_user_name}' already exists. Please choose a different name.")
 
+        # creating new_user dict to be added
         new_user = {
             "id": self._get_unique_user_id(users),
             "name": new_user_name,
             "movies": []
         }
-
+        # adding password and avatar to the new_user dict
         if password:
-            password_hash = bcrypt.hashpw(password.encode('utf-8'),
-                                          bcrypt.gensalt())
-            new_user["password"] = password_hash.decode(
-                'utf-8')  # store hash as string
-
-        if avatar_filename:
-            new_user["avatar"] = avatar_filename  # store avatar filename
+            password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+            new_user["password"] = password_hash.decode('utf-8')  # store hash as string
+            if avatar_filename is None or avatar_filename not in os.listdir(
+                    'static/images'):
+                avatar_filename = 'avatar_default.png'
+            new_user["avatar"] = avatar_filename
 
         users.append(new_user)
         self._save_data(users)
