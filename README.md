@@ -3,7 +3,7 @@ Overview
 The Movie Tracker is a Flask-based web application that allows users to add, edit, and manage movies in their personal list. It uses the Open Movie Database (OMDb) API to fetch movie details and provides functionality for user authentication.
 
 
-**Setup and Installation**
+**Setup and Installation** <br>
 To be updated with the steps for setting up and installing the application.
 
 **Usage**
