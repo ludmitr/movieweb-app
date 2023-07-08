@@ -25,7 +25,7 @@ def add_user():
     # handling empty string passed or name already exist or password < 6
     except ValueError:
         if password:
-            return redirect(url_for('user_register'))
+            return redirect(url_for('user_routes.user_register'))
 
         return redirect(url_for('list_users'))
 

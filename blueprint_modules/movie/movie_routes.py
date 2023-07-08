@@ -40,7 +40,7 @@ def add_movie():
             if movie_to_add:
                 json_data_manager.add_movie_to_user(user_id, movie_to_add)
 
-        return redirect(url_for('user_movies', user_id=user_id))
+        return redirect(url_for('movie_routes.user_movies', user_id=user_id))
     except Exception:
         logger.exception("Exception occurred")
         abort(404)
@@ -69,7 +69,7 @@ def update_movie(user_id, movie_id):
             json_data_manager.update_movie_of_user(user_id, movie_id,
                                                    movie_data_to_update)
 
-        return redirect(url_for('user_movies', user_id=user_id))
+        return redirect(url_for('movie_routes.user_movies', user_id=user_id))
     except Exception:
         logger.exception("Exception occurred")
         abort(404)
@@ -80,7 +80,7 @@ def delete_movie(user_id, movie_id):
     """Delete user's movie if user_id, and movie_id matches"""
     try:
         json_data_manager.delete_movie_of_user(user_id, movie_id)
-        return redirect(url_for('user_movies', user_id=user_id))
+        return redirect(url_for('movie_routes.user_movies', user_id=user_id))
     except Exception:
         logger.exception("Exception occurred")
         abort(404)

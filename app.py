@@ -23,6 +23,7 @@ def list_users():
         logger.exception("Exception occurred")
         abort(404)
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     """Renders a custom '404.html' template whenever a 404 error
