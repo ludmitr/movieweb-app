@@ -19,7 +19,7 @@
     </div>
         <div class="centered-content">
         <h1>{{ user['name'] }} Movies Library</h1>
-        <form class="add-movie-form" action="{{ url_for('add_movie') }}" method="POST">
+        <form class="add-movie-form" action="{{ url_for('movie_routes.add_movie') }}" method="POST">
             <div>Adding movie with omdb API</div>
             <input class="form-control-sm" type="text" name="search_name"
                    placeholder="Enter movie name">
@@ -38,13 +38,13 @@
                  style="width: 50px; height: 50px;"></div>
         </div>
         <div class="d-flex justify-content-end">
-            <form action="{{ url_for('logout') }}" method="GET"
+            <form action="{{ url_for('user_routes.logout') }}" method="GET"
                   class="d-inline-block">
                 <button class="btn btn-outline-danger btn-sm my-2 mr-2 my-sm-0"
                         type="submit">Logout
                 </button>
             </form>
-            <form action="{{ url_for('user_movies') }}" method="GET"
+            <form action="{{ url_for('movie_routes.user_movies') }}" method="GET"
                   class="d-inline-block">
                 <input type="hidden" name="user_id"
                        value="{{ session_user['id'] }}">
@@ -72,11 +72,11 @@
                 <div class='movie-year'>{{ movie['year'] }}</div>
             </div>
             <div class='buttons'>
-                <form action="{{ url_for('update_movie', user_id=user['id'],movie_id=movie['id']) }}"
+                <form action="{{ url_for('movie_routes.update_movie', user_id=user['id'],movie_id=movie['id']) }}"
                       method="GET">
                     <button class="button-8" role="button">Edit</button>
                 </form>
-                <form action="{{ url_for('delete_movie', user_id=user['id'],movie_id=movie['id']) }}"
+                <form action="{{ url_for('movie_routes.delete_movie', user_id=user['id'],movie_id=movie['id']) }}"
                       method="POST">
                     <button class="button-8" role="button">Delete</button>
                 </form>
