@@ -241,15 +241,22 @@ class JSONDataManager(DataManagerInterface):
            Checks the validity of a user's password by comparing a provided
            password with the stored hash of the user's actual password.
         """
-        user = self.get_user_by_name(user_name)
-        if user and 'password' in user:
-            stored_password_hash = user['password'].encode(
-                'utf-8')  # get the stored password hash
-            password_to_check_hash = bcrypt.hashpw(
-                password_to_check.encode('utf-8'), stored_password_hash)
+        all_users = self.get_all_users()
+        user_name_matched = next((user for user in all_users if user['name'] == user_name), None)
+        #
+        if user_name_matched and 'password' in user_name_matched:
+            stored_password_hash = user_name_matched['password'].encode('utf-8')
+            password_to_check_hash = bcrypt.hashpw(password_to_check.encode('utf-8'),
+                                                   stored_password_hash)
+
             return stored_password_hash == password_to_check_hash
 
         return False  # return False for users without a password, or if the user doesn't exist
+
+    def get_user_by_name(self, user_name_to_search: str):
+        """Return user: dict with the same name. if not found returns None"""
+        all_reg_users = self.get_all_users()
+        return next((user for user in all_reg_users if user['name'] == user_name_to_search), None)
 
     # -------------- inner logic methods--------------------------------
 
