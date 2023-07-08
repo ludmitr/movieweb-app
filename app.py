@@ -1,39 +1,16 @@
-import logging
 import os
 from flask import Flask, request, render_template, redirect, url_for, abort, \
     session
 from data_managers.json_data_manager import JSONDataManager
-from data_managers.omdb_api_data_handler import MovieAPIHandler
+from data_managers.omdb_api_data_handler import MovieAPIHandler.
+from logging_config.setup_logger import setup_logger
 
-json_data_manager = JSONDataManager('movies_test_5')
+json_data_manager = JSONDataManager('app_data')
 movies_api_handler = MovieAPIHandler()
-
-# set up log file path for logs
-log_dir = 'logs'
-log_file = 'app.log'
-log_path = os.path.join(log_dir, log_file)
-
-# Create or get the logger
-logger = logging.getLogger(__name__)
-
-# set log level
-logger.setLevel(logging.ERROR)
-
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
-
-handler = logging.FileHandler(log_path)  # set the log handler
-handler.setLevel(logging.ERROR)  # set the handler level
-
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # create a logging format
-handler.setFormatter(formatter)  # set the logging format for the handler
-
-logger.addHandler(handler)
-
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'KAPUT BARTUXA')
 
+logger = setup_logger()
 
 # ------- ROUTES -------------------------------------------------------------
 
