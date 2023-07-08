@@ -5,6 +5,7 @@ body {
 }
 
 .list-movies-title {
+ height: 30%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -109,7 +110,6 @@ li {
 }
 .home-button {
     padding: 10px 20px;
-    margin-top: 20px;
     border: none;
     border-radius: 3px;
     background-color: rgba(23, 162, 184, 0.5);
@@ -123,27 +123,41 @@ li {
     background-color: rgba(23, 162, 184);
 }
 
-.home-form{
-    display: inline
+
+
+
+
+
+
+.home-form-container{
+ display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Aligns items vertically */
+    height: 100%
 }
 
 
-
-
-
-
-
-
-
-
-
-
-.home-form-container {
-    position: absolute;
-    left: 15px;
-    top: 5px;
+.reg-user-container{
+ display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Aligns items vertically */
+    height: 100%
 }
 
+.name-ava-container{
+    display: flex;
+    width: 100%
+}
+
+.add-movie-form{
+    font-size: 1rem;
+}
 .centered-content {
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  text-align: center;
 }
+

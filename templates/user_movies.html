@@ -1,27 +1,63 @@
 <html>
 <head>
     <title>Movie App</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='user_movies_style.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='user_movies_style.css') }}">
+
     <style>
     </style>
 </head>
 <body>
-<div class="list-movies-title">
+<div class="list-movies-title d-flex justify-content-between">
     <div class="home-form-container">
         <!-- Home Button -->
         <form class="home-form" action="{{ url_for('list_users') }}">
             <button type="submit" class="home-button">Home</button>
         </form>
     </div>
-    <div class="centered-content">
+        <div class="centered-content">
         <h1>{{ user['name'] }} Movies Library</h1>
-        <form action="{{ url_for('add_movie') }}" method="POST">
+        <form class="add-movie-form" action="{{ url_for('add_movie') }}" method="POST">
             <div>Adding movie with omdb API</div>
-            <input type="text" name="search_name" placeholder="Enter movie name">
-            <button type="submit">Add movie</button>
+            <input class="form-control-sm" type="text" name="search_name"
+                   placeholder="Enter movie name">
+            <button class="btn btn-dark btn-sm" type="submit">Add movie</button>
             <input type="hidden" name="user_id" value="{{ user['id'] }}">
         </form>
     </div>
+    <div class="reg-user-container">
+
+    {% if session_user %}
+        <div class="nav-item border-info shadow p-1">
+            <div class="name-ava-container align-items-center  justify-content-between">
+           <div> <h3 class="mr-2 text-primary">{{ session_user['name'] }}</h3></div>
+            <div><img src="{{ url_for('static', filename='images/' + session_user['avatar']) }}"
+                 class="rounded-circle img-thumbnail"
+                 style="width: 50px; height: 50px;"></div>
+        </div>
+        <div class="d-flex justify-content-end">
+            <form action="{{ url_for('logout') }}" method="GET"
+                  class="d-inline-block">
+                <button class="btn btn-outline-danger btn-sm my-2 mr-2 my-sm-0"
+                        type="submit">Logout
+                </button>
+            </form>
+            <form action="{{ url_for('user_movies') }}" method="GET"
+                  class="d-inline-block">
+                <input type="hidden" name="user_id"
+                       value="{{ session_user['id'] }}">
+                <button class="btn btn-outline-info btn-sm my-2  my-sm-0"
+                        type="submit">View Movies
+                </button>
+            </form>
+        </div>
+        </div>
+    {% endif %}
+    </div>
+
+
 </div>
 <div>
     <ol class="movie-grid">
@@ -29,17 +65,19 @@
         <li>
             <div class="movie">
                 <a href="{{ movie['imdb_link'] }}" target="_blank">
-                <img class='movie-poster' src="{{ movie['image_link'] }}" />
+                    <img class='movie-poster' src="{{ movie['image_link'] }}"/>
                 </a>
                 <div class='imdb'><em>IMDb:</em>{{ movie['rating'] }}</div>
                 <div class='movie-title'>{{ movie['name'] }}</div>
                 <div class='movie-year'>{{ movie['year'] }}</div>
             </div>
             <div class='buttons'>
-                <form action="{{ url_for('update_movie', user_id=user['id'],movie_id=movie['id']) }}" method="GET">
+                <form action="{{ url_for('update_movie', user_id=user['id'],movie_id=movie['id']) }}"
+                      method="GET">
                     <button class="button-8" role="button">Edit</button>
                 </form>
-                <form action="{{ url_for('delete_movie', user_id=user['id'],movie_id=movie['id']) }}" method="POST">
+                <form action="{{ url_for('delete_movie', user_id=user['id'],movie_id=movie['id']) }}"
+                      method="POST">
                     <button class="button-8" role="button">Delete</button>
                 </form>
             </div>
