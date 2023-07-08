@@ -1,10 +1,11 @@
 import logging
 import os
-from flask import Flask, request, render_template, redirect, url_for, abort
+from flask import Flask, request, render_template, redirect, url_for, abort, session
 from data_managers.json_data_manager import JSONDataManager
 from data_managers.omdb_api_data_handler import MovieAPIHandler
 
-json_data_manager = JSONDataManager('movies_test_2')
+
+json_data_manager = JSONDataManager('movies_test_5')
 movies_api_handler = MovieAPIHandler()
 
 # set up log file path for logs
@@ -38,7 +39,7 @@ app = Flask(__name__)
 def list_users():
     """Main page endpoint, return rendered page with users"""
     try:
-        users = json_data_manager.get_all_users()
+        users = json_data_manager.get_all_public_users()
         return render_template('users.html', users=users)
     except Exception as e:
         abort(404)
@@ -65,13 +66,20 @@ def add_user():
     """adding username if passed and returning to the main page"""
     try:
         user_name = request.form.get('user_name')
+        password = request.form.get('password')
         if user_name:
-            json_data_manager.add_user(user_name)
+            if password:
+                json_data_manager.add_user(user_name, password=password)
+            else:
+                json_data_manager.add_user(user_name)
 
         return redirect(url_for('list_users'))
 
-    # handling empty string passed or name already exist
+    # handling empty string passed or name already exist or password < 6
     except ValueError as ve:
+        if password:
+            return redirect(url_for('user_register'))
+
         return redirect(url_for('list_users'))
 
     except Exception as e:
@@ -134,6 +142,27 @@ def delete_movie(user_id, movie_id):
     except Exception as e:
         logger.exception("Exception occurred")
         abort(404)
+
+@app.route('/new-user')
+def user_register():
+    return render_template('register_new_user.html')
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if json_data_manager.is_password_valid(username, password):
+            session['username'] = username
+        return redirect(url_for('list_users'))
+
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    return redirect(url_for('list_users'))
+
 
 @app.errorhandler(404)
 def page_not_found(e):
