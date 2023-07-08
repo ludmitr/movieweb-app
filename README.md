@@ -6,13 +6,13 @@ The Movie Tracker is a Flask-based web application that allows users to add, edi
 **Setup and Installation** <br>
 To be updated with the steps for setting up and installing the application.
 
-**Usage**
+**Usage**<br>
 To be updated with the steps for using the application.
 
-**Usage***
+**Usage***<br>
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. Please make sure to update tests as appropriate.
 
-License
+**License***<br>
 To be updated with the license details.
 
 
