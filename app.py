@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, render_template, redirect, url_for, abort, \
     session
 from data_managers.json_data_manager import JSONDataManager
-from data_managers.omdb_api_data_handler import MovieAPIHandler.
+from data_managers.omdb_api_data_handler import MovieAPIHandler
 from logging_config.setup_logger import setup_logger
 
 json_data_manager = JSONDataManager('app_data')
