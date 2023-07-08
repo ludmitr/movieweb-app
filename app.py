@@ -1,9 +1,9 @@
 import logging
 import os
-from flask import Flask, request, render_template, redirect, url_for, abort, session
+from flask import Flask, request, render_template, redirect, url_for, abort, \
+    session
 from data_managers.json_data_manager import JSONDataManager
 from data_managers.omdb_api_data_handler import MovieAPIHandler
-
 
 json_data_manager = JSONDataManager('movies_test_5')
 movies_api_handler = MovieAPIHandler()
@@ -14,7 +14,7 @@ log_file = 'app.log'
 log_path = os.path.join(log_dir, log_file)
 
 # Create or get the logger
-logger = logging.getLogger(__name__)  # __name__ resolves to the name of the module, class, or function that called this logging setup
+logger = logging.getLogger(__name__)
 
 # set log level
 logger.setLevel(logging.ERROR)
@@ -25,12 +25,14 @@ if not os.path.exists(log_dir):
 handler = logging.FileHandler(log_path)  # set the log handler
 handler.setLevel(logging.ERROR)  # set the handler level
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # create a logging format
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s')  # create a logging format
 handler.setFormatter(formatter)  # set the logging format for the handler
 
 logger.addHandler(handler)
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'KAPUT BARTUXA')
 
 
 # ------- ROUTES -------------------------------------------------------------
@@ -40,9 +42,12 @@ def list_users():
     """Main page endpoint, return rendered page with users"""
     try:
         users = json_data_manager.get_all_public_users()
-        return render_template('users.html', users=users)
+        session_user = session['username'] if session else None
+        return render_template('users.html', users=users,
+                               session_user=session_user)
     except Exception as e:
         abort(404)
+
 
 @app.route('/user_movies')
 def user_movies():
@@ -50,8 +55,10 @@ def user_movies():
         # render page of user movies if found user by id
         user_id = int(request.args.get('user_id'))
         user = json_data_manager.get_user_by_id(user_id)
+        session_user = session['username'] if session else None
         if user:
-            return render_template('user_movies.html', user=user)
+            return render_template('user_movies.html', user=user,
+                                   session_user=session_user)
 
         # if user id not found redirect to main page
         return redirect(url_for("list_users"))
@@ -86,6 +93,7 @@ def add_user():
         logger.exception("Exception occurred")
         abort(404)
 
+
 @app.route('/add_movie', methods=['POST'])
 def add_movie():
     try:
@@ -113,11 +121,14 @@ def delete_user(user_id):
         logger.exception("Exception occurred")
         abort(404)
 
-@app.route('/users/<int:user_id>/edit_movie/<movie_id>', methods=['GET', 'POST'])
+
+@app.route('/users/<int:user_id>/edit_movie/<movie_id>',
+           methods=['GET', 'POST'])
 def update_movie(user_id, movie_id):
     try:
         if request.method == 'GET':
-            movie_for_update = json_data_manager.get_user_movie(user_id, movie_id)
+            movie_for_update = json_data_manager.get_user_movie(user_id,
+                                                                movie_id)
             return render_template('edit_movie.html', movie=movie_for_update,
                                    user_id=user_id, movie_id=movie_id)
 
@@ -143,6 +154,7 @@ def delete_movie(user_id, movie_id):
         logger.exception("Exception occurred")
         abort(404)
 
+
 @app.route('/new-user')
 def user_register():
     return render_template('register_new_user.html')
@@ -154,8 +166,10 @@ def login():
         username = request.form['username']
         password = request.form['password']
         if json_data_manager.is_password_valid(username, password):
-            session['username'] = username
+            user_data: dict = json_data_manager.get_user_by_name(username)
+            session['username'] = user_data
         return redirect(url_for('list_users'))
+
 
 @app.route('/logout')
 def logout():
@@ -170,5 +184,4 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
-
+    app.run(port=5005)
