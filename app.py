@@ -16,7 +16,7 @@ def list_users():
     """Main page endpoint, return rendered page with users"""
     try:
         users = json_data_manager.get_all_public_users()
-        session_user = session['username'] if session else None
+        session_user = session['username'] if 'username' in session else None
         return render_template('users.html', users=users,
                                session_user=session_user)
     except Exception:
@@ -33,4 +33,4 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    app.run(port=5005)
+    app.run(port=5005, debug=True)
