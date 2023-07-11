@@ -3,7 +3,9 @@ import os
 import json
 import bcrypt
 
-
+AVATAR_FILE_NAMES = {
+    'default': 'avatar_default.png'
+}
 class JSONDataManager(DataManagerInterface):
     """
     This class manages a list of users and their movies. Each user is represented
@@ -101,11 +103,10 @@ class JSONDataManager(DataManagerInterface):
         }
         # adding password and avatar to the new_user dict
         if password:
-            password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-            new_user["password"] = password_hash.decode('utf-8')  # store hash as string
+            new_user["password"] = self._encode_hash_and_decode_password(password)
             if avatar_filename is None or avatar_filename not in os.listdir(
                     'static/images'):
-                avatar_filename = 'avatar_default.png'
+                avatar_filename = AVATAR_FILE_NAMES['default']
             new_user["avatar"] = avatar_filename
 
         users.append(new_user)
@@ -243,7 +244,7 @@ class JSONDataManager(DataManagerInterface):
         """
         all_users = self.get_all_users()
         user_name_matched = next((user for user in all_users if user['name'] == user_name), None)
-        #
+        # checking if stored password of user match the password_to_check
         if user_name_matched and 'password' in user_name_matched:
             stored_password_hash = user_name_matched['password'].encode('utf-8')
             password_to_check_hash = bcrypt.hashpw(password_to_check.encode('utf-8'),
@@ -273,6 +274,11 @@ class JSONDataManager(DataManagerInterface):
 
         return unique_id
 
+    def _encode_hash_and_decode_password(self, password: str) -> str:
+        """Encodes, hashes, and decodes a given password using bcrypt."""
+        password_hash = bcrypt.hashpw(password.encode('utf-8'),
+                                      bcrypt.gensalt())
+        return password_hash.decode('utf-8')
 
 class UserNotFoundError(Exception):
     pass
