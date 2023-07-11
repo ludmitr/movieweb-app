@@ -1,4 +1,5 @@
-from flask import Blueprint, session, request, abort, redirect, url_for, render_template
+from flask import Blueprint, session, request, abort, redirect, url_for, \
+    render_template, flash
 from data_managers.omdb_api_data_handler import MovieAPIHandler
 from logging_config.setup_logger import setup_logger
 from config import json_data_manager
@@ -8,7 +9,7 @@ movies_api_handler = MovieAPIHandler()
 logger = setup_logger()
 
 
-@user_routes.route('/add_user', methods=["POST"])
+@user_routes.route('/users', methods=["POST"])
 def add_user():
     """adding username if passed and returning to the main page"""
     try:
@@ -23,7 +24,8 @@ def add_user():
         return redirect(url_for('list_users'))
 
     # handling empty string passed or name already exist or password < 6
-    except ValueError:
+    except ValueError as e:
+        flash(str(e))  # adding error message to use it in rendered page
         if password:
             return redirect(url_for('user_routes.user_register'))
 
@@ -34,7 +36,7 @@ def add_user():
         abort(404)
 
 
-@user_routes.route("/delete_user/<user_id>", methods=["POST"])
+@user_routes.route("/users/<user_id>/delete", methods=["POST"])
 def delete_user(user_id):
     """Deleting user if user id match with passed user_id"""
     try:
