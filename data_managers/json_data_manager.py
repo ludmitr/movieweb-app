@@ -30,6 +30,7 @@ class JSONDataManager(DataManagerInterface):
 
     The list of users is stored in a JSON file.
     """
+    ENCODING_TYPE = 'utf-8'
 
     def __init__(self, filename: str):
         if not isinstance(filename, str) or not filename:
@@ -229,10 +230,9 @@ class JSONDataManager(DataManagerInterface):
         """Check a user's password."""
         user = self.get_user_by_name(user_name)
         if user and 'password' in user:
-            stored_password_hash = user['password'].encode(
-                'utf-8')  # get the stored password hash
+            stored_password_hash = user['password'].encode(JSONDataManager.ENCODING_TYPE)  # get the stored password hash
             password_to_check_hash = bcrypt.hashpw(
-                password_to_check.encode('utf-8'), stored_password_hash)
+                password_to_check.encode(JSONDataManager.ENCODING_TYPE), stored_password_hash)
             return stored_password_hash == password_to_check_hash
 
         return False  # return False for users without a password, or if the user doesn't exist
@@ -246,11 +246,9 @@ class JSONDataManager(DataManagerInterface):
         user_name_matched = next((user for user in all_users if user['name'] == user_name), None)
         # checking if stored password of user match the password_to_check
         if user_name_matched and 'password' in user_name_matched:
-            stored_password_hash = user_name_matched['password'].encode('utf-8')
-            password_to_check_hash = bcrypt.hashpw(password_to_check.encode('utf-8'),
-                                                   stored_password_hash)
-
-            return stored_password_hash == password_to_check_hash
+            stored_password_hash = user_name_matched['password'].encode(JSONDataManager.ENCODING_TYPE)
+            encoded_password_to_check = password_to_check.encode(JSONDataManager.ENCODING_TYPE)
+            return bcrypt.checkpw(encoded_password_to_check, stored_password_hash)
 
         return False  # return False for users without a password, or if the user doesn't exist
 
@@ -276,9 +274,9 @@ class JSONDataManager(DataManagerInterface):
 
     def _encode_hash_and_decode_password(self, password: str) -> str:
         """Encodes, hashes, and decodes a given password using bcrypt."""
-        password_hash = bcrypt.hashpw(password.encode('utf-8'),
+        password_hash = bcrypt.hashpw(password.encode(JSONDataManager.ENCODING_TYPE),
                                       bcrypt.gensalt())
-        return password_hash.decode('utf-8')
+        return password_hash.decode(JSONDataManager.ENCODING_TYPE)
 
 class UserNotFoundError(Exception):
     pass
