@@ -8,9 +8,6 @@
          body {
             background-color: #F5F5F0;
          }
-
-
-
     </style>
 </head>
 <body>
@@ -67,7 +64,13 @@
 </nav>
 
 <div class="container">
-    <h1 class="text-center text-info mt-5 mb-4">Public Users</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <h5 class="text-center text-info mt-5 mb-4">{{ messages[0] }}</h5>
+        {% else %}
+            <h1 class="text-center text-info mt-5 mb-4">Public Users</h1>
+        {% endif %}
+    {% endwith %}
     <div class="row justify-content-center">
         <div class="col-md-4">
             <form action="{{ url_for('user_routes.add_user') }}" method="POST">
