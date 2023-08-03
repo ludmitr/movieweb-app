@@ -38,7 +38,7 @@ class DataManagerInterface(ABC):
         pass
 
     @abstractmethod
-    def add_user(self, use_name):
+    def add_user(self, user_name: str, password=None, avatar_filename=None):
         pass
 
     @abstractmethod
