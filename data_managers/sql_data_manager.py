@@ -88,7 +88,7 @@ class SQLiteDataManager(DataManagerInterface):
             raise ValueError("User name cannot be empty name")
         if password and len(password) < 6:
             raise ValueError("Password length must be at least 6 characters")
-        user = db.session.execute(db.select(User).filter_by(named=new_user_name)).scalar_one()
+        user = db.session.execute(db.select(User).filter_by(name=new_user_name)).scalar_one_or_none()
         if user:
             raise ValueError(
                 f"User name '{new_user_name}' already exists. Please choose a different name.")
@@ -122,7 +122,7 @@ class SQLiteDataManager(DataManagerInterface):
         pass
 
     def get_all_public_users(self):
-        users = db.session.execute(db.select(User).filter_by(id=None)).scalars()
+        users = db.session.execute(db.select(User).filter_by(password=None)).scalars()
 
         users_for_return = []
         for user in users:

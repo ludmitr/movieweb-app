@@ -1,5 +1,5 @@
 from flask import Blueprint, session, request, abort, redirect, url_for, \
-    render_template, flash
+    render_template, flash, current_app
 from data_managers.omdb_api_data_handler import MovieAPIHandler
 from logging_config.setup_logger import setup_logger
 from config import json_data_manager
@@ -18,9 +18,9 @@ def add_user():
         password = request.form.get('password')
         if user_name:
             if password:
-                sql_data_manager.add_user(user_name, password=password)
+                current_app.sql_data_manager.add_user(user_name, password=password)
             else:
-                sql_data_manager.add_user(user_name)
+                current_app.sql_data_manager.add_user(user_name)
 
         return redirect(url_for('list_users'))
 

@@ -89,6 +89,7 @@ class JSONDataManager(DataManagerInterface):
         if password and len(password) < 6:
             raise ValueError("Password length must be at least 6 characters")
 
+
         users = self.get_all_users()
         # Check if the user name already exists
         for user in users:

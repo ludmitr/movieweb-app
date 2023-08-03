@@ -1,19 +1,18 @@
 import os
-from flask import Flask, render_template, abort, session
+from flask import Flask, render_template, abort, session, current_app
 from data_managers.data_models_for_sql import db
 import config
 from logging_config.setup_logger import setup_logger
 from blueprint_modules.user.user_routes import user_routes
 from blueprint_modules.movie.movie_routes import movie_routes
 from config import json_data_manager
-from data_managers import sql_data_manager
 from data_managers.sql_data_manager import SQLiteDataManager
 
 app = Flask(__name__)
 app.register_blueprint(user_routes)
 app.register_blueprint(movie_routes)
 app.secret_key = os.environ.get('SECRET_KEY', 'KAPUT BARTUXA')
-sql_data_manager = SQLiteDataManager(config.DB_DEFAULT_NAME,app)
+app.sql_data_manager = SQLiteDataManager(config.DB_DEFAULT_NAME, app)
 db.init_app(app)
 logger = setup_logger()
 
@@ -22,7 +21,7 @@ def list_users():
     """Main page endpoint, return rendered page with users"""
 
     try:
-        users = sql_data_manager.get_all_public_users()
+        users = current_app.sql_data_manager.get_all_public_users()
         session_user = session['username'] if 'username' in session else None
         return render_template('users.html', users=users,
                                session_user=session_user)
