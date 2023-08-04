@@ -33,16 +33,6 @@ def user_movies():
 def add_movie():
     """Adding movie to user movies list. The movie information is fetched from
     an external movies API (OMDb) based on the search name passed in the POST request."""
-    # adding movie from omdb - if found
-    movie_name_to_search: str = request.form.get('search_name')
-    user_id = int(request.form.get('user_id'))
-    if movie_name_to_search:
-        movie_to_add = movies_api_handler.get_movie_by_title(
-            movie_name_to_search)
-        if movie_to_add:
-            current_app.sql_data_manager.add_movie_to_user(user_id, movie_to_add)
-
-    return redirect(url_for('movie_routes.user_movies', user_id=user_id))
     try:
         # adding movie from omdb - if found
         movie_name_to_search: str = request.form.get('search_name')
