@@ -1,4 +1,5 @@
-from flask import Blueprint, session, request, abort, redirect, url_for, render_template
+from flask import Blueprint, session, request, abort, redirect, url_for, render_template, \
+    current_app
 from data_managers.omdb_api_data_handler import MovieAPIHandler
 from logging_config.setup_logger import setup_logger
 from config import json_data_manager
@@ -7,13 +8,14 @@ movie_routes = Blueprint('movie_routes', __name__)
 movies_api_handler = MovieAPIHandler()
 logger = setup_logger()
 
+
 @movie_routes.route('/user_movies')
 def user_movies():
     """Render page with movies of specific user"""
     try:
         # render page of user movies if found user by id
         user_id = int(request.args.get('user_id'))
-        user_data = json_data_manager.get_user_by_id(user_id)
+        user_data = current_app.sql_data_manager.get_user_by_id(user_id)
         session_user = session['username'] if session else None
         if user_data:
             return render_template('user_movies.html', user=user_data,
@@ -26,10 +28,21 @@ def user_movies():
         logger.exception("Exception occurred")
         abort(404)
 
+
 @movie_routes.route('/add_movie', methods=['POST'])
 def add_movie():
     """Adding movie to user movies list. The movie information is fetched from
     an external movies API (OMDb) based on the search name passed in the POST request."""
+    # adding movie from omdb - if found
+    movie_name_to_search: str = request.form.get('search_name')
+    user_id = int(request.form.get('user_id'))
+    if movie_name_to_search:
+        movie_to_add = movies_api_handler.get_movie_by_title(
+            movie_name_to_search)
+        if movie_to_add:
+            current_app.sql_data_manager.add_movie_to_user(user_id, movie_to_add)
+
+    return redirect(url_for('movie_routes.user_movies', user_id=user_id))
     try:
         # adding movie from omdb - if found
         movie_name_to_search: str = request.form.get('search_name')
@@ -38,7 +51,7 @@ def add_movie():
             movie_to_add = movies_api_handler.get_movie_by_title(
                 movie_name_to_search)
             if movie_to_add:
-                json_data_manager.add_movie_to_user(user_id, movie_to_add)
+                current_app.sql_data_manager.add_movie_to_user(user_id, movie_to_add)
 
         return redirect(url_for('movie_routes.user_movies', user_id=user_id))
     except Exception:
@@ -47,7 +60,7 @@ def add_movie():
 
 
 @movie_routes.route('/users/<int:user_id>/edit_movie/<movie_id>',
-           methods=['GET', 'POST'])
+                    methods=['GET', 'POST'])
 def update_movie(user_id, movie_id):
     """Update the details of a movie in a user's list.
     It supports both GET and POST methods.

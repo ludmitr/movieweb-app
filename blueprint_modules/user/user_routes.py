@@ -21,7 +21,6 @@ def add_user():
                 current_app.sql_data_manager.add_user(user_name, password=password)
             else:
                 current_app.sql_data_manager.add_user(user_name)
-
         return redirect(url_for('list_users'))
 
     # handling empty string passed or name already exist or password < 6
@@ -42,7 +41,7 @@ def delete_user(user_id):
     """Deleting user if user id match with passed user_id"""
     try:
         user_id = int(user_id)
-        json_data_manager.delete_user(user_id)
+        current_app.sql_data_manager.delete_user(user_id)
         return redirect(url_for('list_users'))
     except Exception:
         logger.exception("Exception occurred")

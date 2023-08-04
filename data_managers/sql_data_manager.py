@@ -4,6 +4,7 @@ from .data_models_for_sql import Movie, User, user_movie_association, db
 
 AVATAR_DEFAULT_NAME = 'avatar_default.png'
 
+
 class SQLiteDataManager(DataManagerInterface):
     def __init__(self, name_of_db, app):
         app.config['SQLALCHEMY_DATABASE_URI'] = config.get_absolute_db_uri(name_of_db)
@@ -88,7 +89,8 @@ class SQLiteDataManager(DataManagerInterface):
             raise ValueError("User name cannot be empty name")
         if password and len(password) < 6:
             raise ValueError("Password length must be at least 6 characters")
-        user = db.session.execute(db.select(User).filter_by(name=new_user_name)).scalar_one_or_none()
+        user = db.session.execute(
+            db.select(User).filter_by(name=new_user_name)).scalar_one_or_none()
         if user:
             raise ValueError(
                 f"User name '{new_user_name}' already exists. Please choose a different name.")
@@ -103,13 +105,46 @@ class SQLiteDataManager(DataManagerInterface):
         db.session.commit()
 
     def delete_user(self, user_id: int):
-        pass
+        user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+        else:
+            raise ValueError(f"User with that id: {user_id} doesnt exist.")
 
     def add_movie_to_user(self, user_id: int, movie_to_add: dict):
-        pass
+        new_movie = Movie(id=movie_to_add['id'], name=movie_to_add['name'],
+                          director=movie_to_add['director'], year=movie_to_add['year'],
+                          rating=movie_to_add['rating'], imdb_link=movie_to_add['imdb_link'],
+                          image_link=movie_to_add['image_link']
+                          )
+
+        user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
+        if user:
+            new_movie.users.append(user)
+            db.session.add(new_movie)
+            db.session.commit()
 
     def get_user_by_id(self, user_id: int) -> dict:
-        pass
+        """return list of movies(dict) if user id found. otherwise None"""
+        user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
+
+        if user:
+            user_to_return = {
+                'id': user.id,
+                'name': user.name,
+                'movies': [{
+                    'id': movie.id,
+                    'name': movie.name,
+                    'director': movie.director,
+                    'year': movie.year,
+                    'rating': movie.rating,
+                    'imdb_link': movie.imdb_link,
+                    'image_link': movie.image_link
+                } for movie in user.movies]
+            }
+
+            return user_to_return
 
     def delete_movie_of_user(self, user_id: int, movie_id: str):
         pass
