@@ -20,6 +20,7 @@ class User(db.Model):
         back_populates="users",
     )
 
+
 class Movie(db.Model):
     __tablename__ = 'movies'
 
@@ -33,7 +34,7 @@ class Movie(db.Model):
     users = db.relationship(
         "User",
         secondary=user_movie_association,
-        back_populates="movies",
+        back_populates="movies"
     )
 
 

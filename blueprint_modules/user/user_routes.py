@@ -68,8 +68,8 @@ def login():
     try:
         username = request.form['username']
         password = request.form['password']
-        if json_data_manager.is_password_valid(username, password):
-            user_data: dict = json_data_manager.get_user_by_name(username)
+        if current_app.sql_data_manager.is_password_valid(username, password):
+            user_data: dict = current_app.sql_data_manager.get_user_by_name(username)
             session['username'] = user_data
         return redirect(url_for('list_users'))
 

@@ -5,7 +5,6 @@ import config
 from logging_config.setup_logger import setup_logger
 from blueprint_modules.user.user_routes import user_routes
 from blueprint_modules.movie.movie_routes import movie_routes
-from config import json_data_manager
 from data_managers.sql_data_manager import SQLiteDataManager
 
 app = Flask(__name__)
@@ -19,7 +18,6 @@ logger = setup_logger()
 @app.route('/')
 def list_users():
     """Main page endpoint, return rendered page with users"""
-
     try:
         users = current_app.sql_data_manager.get_all_public_users()
         session_user = session['username'] if 'username' in session else None
