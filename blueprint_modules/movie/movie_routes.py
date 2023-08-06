@@ -2,7 +2,6 @@ from flask import Blueprint, session, request, abort, redirect, url_for, render_
     current_app, flash
 from data_managers.omdb_api_data_handler import MovieAPIHandler
 from logging_config.setup_logger import setup_logger
-from config import json_data_manager
 
 movie_routes = Blueprint('movie_routes', __name__)
 movies_api_handler = MovieAPIHandler()
@@ -15,7 +14,7 @@ def user_movies():
     try:
         # render page of user movies if found user by id
         user_id = int(request.args.get('user_id'))
-        user_data = current_app.sql_data_manager.get_user_by_id(user_id)
+        user_data = current_app.data_manager.get_user_by_id(user_id)
         session_user = session['username'] if session else None
         if user_data:
             return render_template('user_movies.html', user=user_data,
@@ -41,7 +40,7 @@ def add_movie():
             movie_to_add = movies_api_handler.get_movie_by_title(
                 movie_name_to_search)
             if movie_to_add:
-                current_app.sql_data_manager.add_movie_to_user(user_id, movie_to_add)
+                current_app.data_manager.add_movie_to_user(user_id, movie_to_add)
 
         return redirect(url_for('movie_routes.user_movies', user_id=user_id))
     except Exception:
@@ -59,7 +58,7 @@ def update_movie(user_id, movie_id):
     """
     try:
         if request.method == 'GET':
-            movie_for_update = current_app.sql_data_manager.get_user_movie(user_id,
+            movie_for_update = current_app.data_manager.get_user_movie(user_id,
                                                                            movie_id)
             return render_template('edit_movie.html', movie=movie_for_update,
                                    user_id=user_id, movie_id=movie_id)
@@ -68,12 +67,12 @@ def update_movie(user_id, movie_id):
             movie_data_to_update = {}
             for key, value in request.form.items():
                 movie_data_to_update[key] = value
-            current_app.sql_data_manager.update_movie_of_user(user_id, movie_id,
+            current_app.data_manager.update_movie_of_user(user_id, movie_id,
                                                               movie_data_to_update)
         return redirect(url_for('movie_routes.user_movies', user_id=user_id))
     except ValueError as e:
         flash(str(e))  # adding error message to use it in rendered page
-        movie_for_update = current_app.sql_data_manager.get_user_movie(user_id,
+        movie_for_update = current_app.data_manager.get_user_movie(user_id,
                                                                        movie_id)
         return render_template('edit_movie.html', movie=movie_for_update,
                                user_id=user_id, movie_id=movie_id)
@@ -86,7 +85,7 @@ def update_movie(user_id, movie_id):
 def delete_movie(user_id, movie_id):
     """Delete user's movie if user_id, and movie_id matches"""
     try:
-        current_app.sql_data_manager.delete_movie_of_user(user_id, movie_id)
+        current_app.data_manager.delete_movie_of_user(user_id, movie_id)
         return redirect(url_for('movie_routes.user_movies', user_id=user_id))
     except Exception:
         logger.exception("Exception occurred")

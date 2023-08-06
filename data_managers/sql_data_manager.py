@@ -12,6 +12,8 @@ class SQLiteDataManager(DataManagerInterface):
 
     def __init__(self, name_of_db, app):
         app.config['SQLALCHEMY_DATABASE_URI'] = config.get_absolute_db_uri(name_of_db)
+        db.init_app(app)
+
 
     def get_user_movies(self, user_id):
         """return list of movies(dict) if user id found. otherwise None"""
@@ -169,8 +171,6 @@ class SQLiteDataManager(DataManagerInterface):
             users_for_return.append(new_user)
         return users_for_return
 
-    def get_all_registered_users(self):
-        pass
 
     def get_user_by_name(self, user_name_to_search: str):
         user: User = db.session.execute(

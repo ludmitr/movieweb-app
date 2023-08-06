@@ -37,4 +37,15 @@ class Movie(db.Model):
         back_populates="movies"
     )
 
+class Review(db.Model):
+    __tablename__ = 'reviews'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    movie_id = db.Column(db.String, db.ForeignKey('movies.id'))
+    review = db.Column(db.String)
+
+    user = db.relationship('User', backref='reviews')
+    movie = db.relationship('Movie', backref='reviews')
+
 
