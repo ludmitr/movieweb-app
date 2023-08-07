@@ -5,159 +5,123 @@ body {
 }
 
 .list-movies-title {
- height: 30%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 0;
-    color: #17a2b8;
-    border: 1px solid #17a2b8;
-    box-shadow: 0 7px 12px rgba(0, 0, 0, 0.2);
-    font-size: 16pt;
+  height: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  color: #17a2b8;
+  border: 1px solid #17a2b8;
+  box-shadow: 0 7px 12px rgba(0, 0, 0, 0.2);
+  font-size: 16pt;
 }
 
 .movie-grid {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  padding: 15px;
+  list-style: none;
 }
 
 .movie-grid li {
-  padding: 10px 15px;
-  text-align: left;
+  border: 1px solid #17a2b8;
+  border-radius: 5px;
+  padding: 10px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .movie {
-  width: 140px;
+  text-align: center;
   position: relative;
 }
 
-.movie-title,
-.movie-year {
-  font-size: 0.8em;
-  text-align: center;
-}
-
-.movie-title {
-  margin-top: 10px;
-}
-
-.movie-year {
-  color: #999;
-}
-
 .movie-poster {
+  max-width: 100%;
+  height: auto;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-  width: 128px;
-  height: 193px;
 }
 
 .imdb {
-  font-size: 0.5em;
-  background-color: rgb(245, 197, 24); /* semi-transparent black background */
-  padding: 5px;
+  font-size: 0.7em;
+  background-color: rgb(245, 197, 24);
+  padding: 4px;
   position: absolute;
   top: 0;
   left: 0;
   margin: 0;
+  z-index: 1; /* Ensure it's above the image */
 }
-.country_flag{
-    position: absolute;
-    top: 18px;
-    left: 0;
+
+
+.movie-title,
+.movie-year {
+  margin: 5px 0;
+  font-size: 0.8em;
 }
-.imdb em{
- font-weight: bold
+
+.buttons-top,
+.buttons-bottom {
+  display: flex;
+  justify-content: center;
 }
 
 .button-8 {
-    padding: 5px 10px;
-    margin: 5px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
+  flex-grow: 1;
+  padding: 8px;
+  margin: 5px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
 .button-8:hover {
-    opacity: 0.8;
+  opacity: 0.8;
 }
 
-.buttons {
-    display: flex;
-    justify-content: flex-star;
-}
-
-/* Edit button styling */
 form[action*='edit_movie'] .button-8 {
-    background-color: #DEB522;
-    color: white;
+  background-color: #DEB522;
+  color: white;
 }
 
-/* Delete button styling */
 form[action*='delete_movie'] .button-8 {
-    background-color: #f44336; /* Red */
-    color: white;
+  background-color: #f44336;
+  color: white;
 }
 
-li {
-    border: 1px solid #17a2b8;
+.buttons-bottom form:nth-child(1) .button-8 {
+  background-color: #28a745;
+  color: white;
 }
+
+.buttons-bottom form:nth-child(2) .button-8 {
+  background-color: #17a2b8;
+  color: white;
+}
+
 .home-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 3px;
-    background-color: rgba(23, 162, 184, 0.5);
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 3px;
+  background-color: rgba(23, 162, 184, 0.5);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .home-button:hover {
-    background-color: rgba(23, 162, 184);
+  background-color: rgba(23, 162, 184);
 }
 
 
-
-
-
-
-
-.home-form-container{
- display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Aligns items vertically */
-    height: 100%
+.review-button .button-8 {
+  background-color: #17a2b8;
+  color: white;
 }
-
-
-.reg-user-container{
- display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Aligns items vertically */
-    height: 100%
-}
-
-.name-ava-container{
-    display: flex;
-    width: 100%
-}
-
-.add-movie-form{
-    font-size: 1rem;
-}
-.centered-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  height: 100%;
-  text-align: center;
-}
-

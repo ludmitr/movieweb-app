@@ -1,6 +1,6 @@
 import config
 from .data_manager_interface import DataManagerInterface
-from .data_models_for_sql import Movie, User, db
+from .data_models_for_sql import Movie, User, Review, db
 import bcrypt
 from datetime import datetime
 
@@ -13,7 +13,6 @@ class SQLiteDataManager(DataManagerInterface):
     def __init__(self, name_of_db, app):
         app.config['SQLALCHEMY_DATABASE_URI'] = config.get_absolute_db_uri(name_of_db)
         db.init_app(app)
-
 
     def get_user_movies(self, user_id):
         """return list of movies(dict) if user id found. otherwise None"""
@@ -38,6 +37,10 @@ class SQLiteDataManager(DataManagerInterface):
         Passwords are hashed and salted before being stored.
         """
         # validate passed arguments
+        if not new_user_name:
+            raise ValueError("User name cannot be empty")
+        if len(new_user_name) > 15:
+            raise ValueError("User name can be 15 characters long maximum")
         if not isinstance(new_user_name, str):
             raise TypeError("User name need to be a string")
         if not new_user_name:
@@ -60,7 +63,7 @@ class SQLiteDataManager(DataManagerInterface):
         db.session.commit()
 
     def delete_user(self, user_id: int):
-        user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
+        user: User = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
         if not user:
             raise ValueError(f"User with that id: {user_id} doesnt exist.")
 
@@ -68,6 +71,9 @@ class SQLiteDataManager(DataManagerInterface):
         for movie in user.movies:
             if len(movie.users) == 1:
                 db.session.delete(movie)
+        # deleting users reviews
+        for review in user.reviews:
+            db.session.delete(review)
 
         db.session.delete(user)
         db.session.commit()
@@ -119,12 +125,18 @@ class SQLiteDataManager(DataManagerInterface):
         if not movie:
             raise ValueError(f"Movie with that id: {movie_id} doesnt exist.")
 
+        # removing reviews of movie
+        for review in movie.reviews:
+            db.session.delete(review)
+
         # removing the movie from user.movies and if the movies doesnt have any users associated, remove the movie too
         if movie in user.movies:
             user.movies.remove(movie)
             if len(movie.users) == 0:
                 db.session.delete(movie)
             db.session.commit()
+
+
 
     def get_user_movie(self, user_id: int, movie_id: str):
         movie: Movie = db.session.execute(
@@ -142,7 +154,8 @@ class SQLiteDataManager(DataManagerInterface):
         return self._fetch_movie_data(movie)
 
     def update_movie_of_user(self, user_id: int, movie_id: str, movie_for_update: dict):
-        movie: Movie = db.session.execute(db.select(Movie).filter_by(id=movie_id)).scalar_one_or_none()
+        movie: Movie = db.session.execute(
+            db.select(Movie).filter_by(id=movie_id)).scalar_one_or_none()
 
         # data validation
         if not movie:
@@ -159,6 +172,7 @@ class SQLiteDataManager(DataManagerInterface):
         movie.year = movie_for_update['year']
         movie.rating = str(float(movie_for_update['rating']))
         db.session.commit()
+
     def get_all_public_users(self):
         users = db.session.execute(db.select(User).filter_by(password=None)).scalars()
 
@@ -170,7 +184,6 @@ class SQLiteDataManager(DataManagerInterface):
             }
             users_for_return.append(new_user)
         return users_for_return
-
 
     def get_user_by_name(self, user_name_to_search: str):
         user: User = db.session.execute(
@@ -184,6 +197,60 @@ class SQLiteDataManager(DataManagerInterface):
                 'movies': [self._fetch_movie_data(movie) for movie in user.movies]
             }
             return user_to_return
+
+    def get_users_movie_review(self, user_id: int, movie_id: str) -> str:
+        """Returns users review on specific film, if review doesnt exist, returns '' """
+        review = db.session.execute(
+            db.select(Review).filter_by(user_id=user_id, movie_id=movie_id)).scalar_one_or_none()
+
+        return review.review if review else ''
+
+    def update_users_movie_review(self, users_id: int, movie_id: str, review_text_to_update: str):
+        """Update current review of user about the film, if there is no review, creates one"""
+
+        # validation for new review
+        user = db.session.execute(db.select(User).filter_by(id=users_id)).scalar_one_or_none()
+        movie = db.session.execute(db.select(Movie).filter_by(id=movie_id)).scalar_one_or_none()
+        if not user:
+            raise ValueError(f"User with id: {users_id} doesnt exist")
+        if not movie:
+            raise ValueError(f"Movie with id: {movie_id} doesnt exist")
+        if len(review_text_to_update) < 50:
+            raise ValueError(f"Review needs to be at least 50 char long")
+
+        review = db.session.execute(
+            db.select(Review).filter_by(user_id=users_id, movie_id=movie_id)).scalar_one_or_none()
+
+        # update existing review
+        if review:
+            review.review = review_text_to_update
+            db.session.commit()
+            return
+
+        # creating new review case when there was no review instance for specific user and movie
+        new_review = Review(review=review_text_to_update, movie_id=movie_id, user_id=users_id)
+        db.session.add(new_review)
+        db.session.commit()
+
+
+    def get_movie_by_id(self, movie_id):
+        movie = db.session.execute(db.select(Movie).filter_by(id=movie_id)).scalar_one_or_none()
+        return movie
+
+    def delete_review(self, user_id: int, movie_id: str) -> bool:
+        """
+        Deleting review with passed by user_id and movie id values.
+        Returns:
+            True - if succeed
+            False - if review doesn't exist
+        """
+        review = db.session.execute(db.select(Review).filter_by(movie_id=movie_id, user_id=user_id)).scalar_one_or_none()
+        if review:
+            db.session.delete(review)
+            db.session.commit()
+            return True
+        return False
+
 
     def _fetch_movie_data(self, movie: Movie) -> dict:
         """Creates dict from movie instance and returns it"""

@@ -228,7 +228,7 @@ class JSONDataManager(DataManagerInterface):
         all_users = self.get_all_users()
         return [user for user in all_users if 'password' in user]
 
-        """Check a user's password."""
+        # check users password
         user = self.get_user_by_name(user_name)
         if user and 'password' in user:
             stored_password_hash = user['password'].encode(JSONDataManager.ENCODING_TYPE)  # get the stored password hash

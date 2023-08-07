@@ -75,16 +75,27 @@
                 <div class='movie-title'>{{ movie['name'] }}</div>
                 <div class='movie-year'>{{ movie['year'] }}</div>
             </div>
-            <div class='buttons'>
-                <form action="{{ url_for('movie_routes.update_movie', user_id=user['id'],movie_id=movie['id']) }}"
+            <div class='buttons-top'>
+                <form action="{{ url_for('movie_routes.update_movie', user_id=user['id'], movie_id=movie['id']) }}"
                       method="GET">
                     <button class="button-8" role="button">Edit</button>
                 </form>
-                <form action="{{ url_for('movie_routes.delete_movie', user_id=user['id'],movie_id=movie['id']) }}"
+                <form action="{{ url_for('movie_routes.movie_reviews', movie_id=movie['id']) }}"
+                      method="GET" class="review-button">
+                    <button class="button-8" role="button">Reviews</button>
+                </form>
+                <form action="{{ url_for('movie_routes.delete_movie', user_id=user['id'], movie_id=movie['id']) }}"
                       method="POST">
                     <button class="button-8" role="button">Delete</button>
                 </form>
             </div>
+            <div class='buttons-bottom'>
+                <form action="{{ url_for('movie_routes.add_review', user_id=user['id'], movie_id=movie['id']) }}"
+                      method="GET">
+                    <button class="button-8" role="button">Add Review</button>
+                </form>
+            </div>
+
         </li>
         {% endfor %}
     </ol>
