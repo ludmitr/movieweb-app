@@ -12,6 +12,3 @@ def get_absolute_db_uri(db_name):
 
 def get_json_data_manager():
     return JSONDataManager(JSON_DB_DEFAULT_NAME)
-
-def get_sqlite_data_manager(app):
-    return SQLiteDataManager(DB_DEFAULT_NAME, app)

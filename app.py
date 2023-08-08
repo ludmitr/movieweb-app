@@ -4,14 +4,17 @@ import config
 from logging_config.setup_logger import setup_logger
 from blueprint_modules.user.user_routes import user_routes
 from blueprint_modules.movie.movie_routes import movie_routes
-from data_managers.data_models_for_sql import db
+from blueprint_modules.api.api_routes import api_routes
+from data_managers.omdb_api_data_handler import MovieAPIHandler
+from data_managers.sql_data_manager import SQLiteDataManager
+
 
 app = Flask(__name__)
 app.register_blueprint(user_routes)
 app.register_blueprint(movie_routes)
+app.register_blueprint(api_routes)
 app.secret_key = os.environ.get('SECRET_KEY', 'KAPUT BARTUXA')
-app.data_manager = config.get_sqlite_data_manager(app)
-# app.data_manager = config.get_json_data_manager()
+app.data_manager = SQLiteDataManager(config.DB_DEFAULT_NAME, app)
 logger = setup_logger()
 
 @app.route('/')

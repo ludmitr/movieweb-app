@@ -16,20 +16,34 @@ class SQLiteDataManager(DataManagerInterface):
 
     def get_user_movies(self, user_id):
         """return list of movies(dict) if user id found. otherwise None"""
-        user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one()
+        user_id = int(user_id)
+        user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
+        if not user:
+            raise ValueError(f"User with id {user_id}, doesnt exist")
 
-        if user:
-            user_movies_to_return = [{
-                'id': movie.id,
-                'name': movie.name,
-                'director': movie.director,
-                'year': movie.year,
-                'rating': movie.rating,
-                'imdb_link': movie.imdb_link,
-                'image_link': movie.image_link
-            } for movie in user.movies]
+        user_movies_to_return = [{
+            'id': movie.id,
+            'name': movie.name,
+            'director': movie.director,
+            'year': movie.year,
+            'rating': movie.rating,
+            'imdb_link': movie.imdb_link,
+            'image_link': movie.image_link
+        } for movie in user.movies]
 
-            return user_movies_to_return
+        return user_movies_to_return
+
+    def get_all_users(self):
+        users = db.session.execute(db.select(User)).scalars()
+
+        users_for_return = []
+        for user in users:
+            new_user = {
+                'id': user.id,
+                'name': user.name,
+            }
+            users_for_return.append(new_user)
+        return users_for_return
 
     def add_user(self, new_user_name: str, password=None, avatar_filename=None):
         """
@@ -80,6 +94,10 @@ class SQLiteDataManager(DataManagerInterface):
 
     def add_movie_to_user(self, user_id: int, movie_data: dict):
         """if the movies doesnt exist in db - adds a new movie and associate it with user."""
+        user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
+        if user is None:
+            raise ValueError(f"User with that ID: {user_id},doesnt exist")
+
         # checking if the movie exist in db, if not - adding it to db.
         movie = db.session.execute(
             db.select(Movie).filter_by(id=movie_data['id'])).scalar_one_or_none()
@@ -90,13 +108,12 @@ class SQLiteDataManager(DataManagerInterface):
                           image_link=movie_data['image_link']
                           )
             db.session.add(movie)
-            db.session.commit()
 
-        # adding relation to user_movie_association
-        user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
-        if user:
+        # Adding a relationship to user_movie_association
+        if user not in movie.users:
             movie.users.append(user)
-            db.session.commit()
+
+        db.session.commit()
 
     def get_user_by_id(self, user_id: int) -> dict:
         """
@@ -115,6 +132,16 @@ class SQLiteDataManager(DataManagerInterface):
             return user_to_return
 
     def delete_movie_of_user(self, user_id: int, movie_id: str):
+        """
+        Deletes a movie from a user's collection and also removes the movie if there are no
+        users associated with it.
+
+        The function first retrieves the user and movie instances using the provided IDs,
+        validates their existence, and checks if the movie is part of the user's collection.
+        If the movie is found, it's removed from the user's collection, and any associated reviews
+        are deleted. If there are no remaining users associated with the movie, the movie itself
+        is deleted from the database.
+        """
         # getting movie and user instances
         user = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
         movie = db.session.execute(db.select(Movie).filter_by(id=movie_id)).scalar_one_or_none()
@@ -124,19 +151,19 @@ class SQLiteDataManager(DataManagerInterface):
             raise ValueError(f"User with that id: {user_id} doesnt exist.")
         if not movie:
             raise ValueError(f"Movie with that id: {movie_id} doesnt exist.")
+        if movie not in user.movies:
+            raise ValueError(f"This user doesnt got movie with ID: {movie_id} in he's collection")
 
         # removing reviews of movie
         for review in movie.reviews:
             db.session.delete(review)
 
         # removing the movie from user.movies and if the movies doesnt have any users associated, remove the movie too
-        if movie in user.movies:
-            user.movies.remove(movie)
-            if len(movie.users) == 0:
-                db.session.delete(movie)
-            db.session.commit()
-
-
+        user.movies.remove(movie)
+        if len(movie.users) == 0:
+            db.session.delete(movie)
+        db.session.commit()
+        return self._fetch_movie_data(movie)
 
     def get_user_movie(self, user_id: int, movie_id: str):
         movie: Movie = db.session.execute(
@@ -232,7 +259,6 @@ class SQLiteDataManager(DataManagerInterface):
         db.session.add(new_review)
         db.session.commit()
 
-
     def get_movie_by_id(self, movie_id):
         movie = db.session.execute(db.select(Movie).filter_by(id=movie_id)).scalar_one_or_none()
         return movie
@@ -244,13 +270,45 @@ class SQLiteDataManager(DataManagerInterface):
             True - if succeed
             False - if review doesn't exist
         """
-        review = db.session.execute(db.select(Review).filter_by(movie_id=movie_id, user_id=user_id)).scalar_one_or_none()
-        if review:
-            db.session.delete(review)
-            db.session.commit()
-            return True
-        return False
 
+        # VALIDATION
+        user: User = db.session.execute(db.select(User).filter_by(id=user_id)).scalar_one_or_none()
+        if user is None:
+            raise ValueError(f"there is no user with ID: {user_id}.")
+        movie = db.session.execute(db.select(Movie).filter_by(id=movie_id)).scalar_one_or_none()
+        if movie is None:
+            raise ValueError(f"there is no movie with ID: {movie_id}.")
+        if movie not in user.movies:
+            raise ValueError(f"User with ID:{user_id} doesnt have movie with ID:{movie_id}")
+        review = db.session.execute(
+            db.select(Review).filter_by(movie_id=movie_id, user_id=user_id)).scalar_one_or_none()
+        if review is None:
+            raise ValueError("there is no review for that movie from that user")
+
+        db.session.delete(review)
+        db.session.commit()
+
+
+    def get_all_reviews_for_movie(self, movie_id):
+        """
+        Retrieves all reviews for a movie by its ID.
+
+        :param movie_id: The ID of the movie.
+        :return: A list of dictionaries containing reviews.
+        :raises ValueError: If there is no movie in db with movie_id.
+        """
+        # Validation
+        movie: Movie = db.session.execute(db.select(Movie).filter_by(id=movie_id)).scalar_one_or_none()
+        if movie is None:
+            raise ValueError(f"There is no movie with ID: {movie_id}")
+
+        # creating list with dict of reviews for return
+        reviews: list = db.session.execute(db.select(Review).filter_by(movie_id=movie_id)).scalars()
+        reviews_to_return = []
+        for review in reviews:
+            reviews_to_return.append({'user_name': review.user.name, "review": review.review})
+
+        return reviews_to_return
 
     def _fetch_movie_data(self, movie: Movie) -> dict:
         """Creates dict from movie instance and returns it"""
