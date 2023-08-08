@@ -1,8 +1,5 @@
-from flask import Blueprint, session, request, abort, redirect, url_for, render_template, \
-    current_app, flash, jsonify
+from flask import Blueprint, request, current_app, jsonify
 from data_managers.omdb_api_data_handler import MovieAPIHandler
-from data_managers.sql_data_manager import SQLiteDataManager
-from logging_config.setup_logger import setup_logger
 
 api_routes = Blueprint('api_routes', __name__)
 movies_api_handler = MovieAPIHandler()
