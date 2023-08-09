@@ -153,7 +153,6 @@ def delete_movie_of_user(user_id, movie_id):
             {'message': f'Movie with ID {movie_id} successfully deleted from user {user_id}.',
              'deleted_movie': deleted_movie}), 200
 
-
     except TypeError as e:
         return jsonify({'error': str(e)}), 400
     except ValueError as e:
@@ -176,7 +175,6 @@ def review_manager(user_id, movie_id):
         if request.method == 'DELETE':
             current_app.data_manager.delete_review(user_id, movie_id)
             return jsonify("Successfully deleted review"), 200
-
 
         # POST REQUEST HADLING
         # Check if JSON data is passed

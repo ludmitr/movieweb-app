@@ -9,63 +9,81 @@
             background-color: #F5F5F0;
          }
 
+
     </style>
 </head>
 <body>
-<nav class="navbar navbar-light bg-transparent shadow-sm border-info">
-    <a class="navbar-brand d-none d-lg-block" href="#">MovieWeb App</a>
-    <div class="d-flex justify-content-end">
-        <ul class="navbar-nav">
-            <li class="nav-item border-info shadow p-1">
-                {% if session_user %}
-                <div class="d-flex align-items-center ml-auto justify-content-between">
-                    <h3 class="mr-2 text-primary">{{ session_user['name']
-                        }}</h3>
-                    <img src="{{ url_for('static', filename='images/' + session_user['avatar']) }}"
-                         class="rounded-circle img-thumbnail"
-                         style="width: 50px; height: 50px;">
-                </div>
-                <div class="d-flex justify-content-end">
-                    <form action="{{ url_for('user_routes.logout') }}"
-                          method="GET"
-                          class="d-inline-block">
-                        <button class="btn btn-outline-danger btn-sm my-2 mr-2 my-sm-0"
-                                type="submit">Logout
-                        </button>
-                    </form>
-                    <form action="{{ url_for('movie_routes.user_movies') }}"
-                          method="GET"
-                          class="d-inline-block">
-                        <input type="hidden" name="user_id"
-                               value="{{ session_user['id'] }}">
-                        <button class="btn btn-outline-info btn-sm my-2  my-sm-0"
-                                type="submit">View Movies
-                        </button>
-                    </form>
-                </div>
-                {% else %}
-                <form class="form-inline"
-                      action="{{ url_for('user_routes.login') }}"
-                      method="POST">
-                    <div class="input-group mb-2">
-                        <input class="form-control mr-sm-2" type="text"
-                               placeholder="Username" name="username" required>
-                        <input class="form-control mr-sm-2" type="password"
-                               placeholder="Password" name="password" required
-                               minlength="6">
+<nav class=" container justify-content-between navbar navbar-expand-lg navbar-light shadow-sm">
+            <div class=" d-flex justify-content-center order-lg-2 mb-2 mb-lg-0">
+            <form action="{{ url_for('api_explain') }}" method="GET"
+                  class="mr-2">
+                <button type="submit"
+                        class="btn btn-info btn-round shadow bg-transparent text-info">
+                    REST API DOC
+                </button>
+            </form>
+            <form action="{{ url_for('restore_default_db')}}" method="GET"
+                  class="ml-2">
+                <button type="submit"
+                        class="btn btn-danger btn-round shadow bg-transparent text-danger">
+                    Restore Default Data
+                </button>
+            </form>
+        </div>
+        <div class="d-flex justify-content-end">
+            <ul class="navbar-nav">
+                <li class="nav-item border-info shadow p-1">
+                    {% if session_user %}
+                    <div class="d-flex align-items-center ml-auto justify-content-between">
+                        <h3 class="mr-2 text-primary">{{ session_user['name']
+                            }}</h3>
+                        <img src="{{ url_for('static', filename='images/' + session_user['avatar']) }}"
+                             class="rounded-circle img-thumbnail"
+                             style="width: 50px; height: 50px;">
                     </div>
-                    <div class="input-group justify-content-end">
-                        <button class="btn btn-outline-success my-2 mr-2 my-sm-0"
-                                type="submit">Login
-                        </button>
-                        <a href="{{ url_for('user_routes.user_register') }}"
-                           class="btn btn-outline-info my-2 my-sm-0">Register</a>
+                    <div class="d-flex justify-content-end">
+                        <form action="{{ url_for('user_routes.logout') }}"
+                              method="GET"
+                              class="d-inline-block">
+                            <button class="btn btn-outline-danger btn-sm my-2 mr-2 my-sm-0"
+                                    type="submit">Logout
+                            </button>
+                        </form>
+                        <form action="{{ url_for('movie_routes.user_movies') }}"
+                              method="GET"
+                              class="d-inline-block">
+                            <input type="hidden" name="user_id"
+                                   value="{{ session_user['id'] }}">
+                            <button class="btn btn-outline-info btn-sm my-2  my-sm-0"
+                                    type="submit">View Movies
+                            </button>
+                        </form>
                     </div>
-                </form>
-                {% endif %}
-            </li>
-        </ul>
-    </div>
+                    {% else %}
+                    <form class="form-inline"
+                          action="{{ url_for('user_routes.login') }}"
+                          method="POST">
+                        <div class="input-group mb-2">
+                            <input class="form-control mr-sm-2" type="text"
+                                   placeholder="Username" name="username"
+                                   required>
+                            <input class="form-control mr-sm-2" type="password"
+                                   placeholder="Password" name="password"
+                                   required
+                                   minlength="6">
+                        </div>
+                        <div class="input-group justify-content-end">
+                            <button class="btn btn-outline-success my-2 mr-2 my-sm-0"
+                                    type="submit">Login
+                            </button>
+                            <a href="{{ url_for('user_routes.user_register') }}"
+                               class="btn btn-outline-info my-2 my-sm-0">Register</a>
+                        </div>
+                    </form>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
 </nav>
 
 
@@ -74,7 +92,7 @@
     {% if messages %}
     <h5 class="text-center text-info mt-5 mb-4">{{ messages[0] }}</h5>
     {% else %}
-    <h1 class="text-center text-info mt-5 mb-4">Public Users</h1>
+    <h1 class="text-center text-info mt-5 mb-4">PUBLIC USERS</h1>
     {% endif %}
     {% endwith %}
     <div class="row justify-content-center">

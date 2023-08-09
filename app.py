@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, abort, session, current_app
+from flask import Flask, render_template, abort, session, current_app, flash, redirect, url_for
 import config
 from logging_config.setup_logger import setup_logger
 from blueprint_modules.user.user_routes import user_routes
@@ -14,7 +14,7 @@ app.register_blueprint(user_routes)
 app.register_blueprint(movie_routes)
 app.register_blueprint(api_routes)
 app.secret_key = os.environ.get('SECRET_KEY', 'KAPUT BARTUXA')
-app.data_manager = SQLiteDataManager(config.DB_DEFAULT_NAME, app)
+app.data_manager = SQLiteDataManager(config.SQL_DB_FILE_NAME, app)
 logger = setup_logger()
 
 @app.route('/')
@@ -29,9 +29,16 @@ def list_users():
         logger.exception("Exception occurred")
         abort(404)
 
-@app.route('/api/faq')
+@app.route('/api_faq')
 def api_explain():
     return render_template('api_explain.html')
+
+@app.route('/restore_data')
+def restore_default_db():
+    app.data_manager.restore_db_to_default()
+    message_for_user = 'Database RESTORED!'
+    flash(message_for_user)
+    return redirect(url_for('list_users'))
 
 @app.errorhandler(404)
 def page_not_found(e):

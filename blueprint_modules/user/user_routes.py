@@ -69,6 +69,10 @@ def login():
         if current_app.data_manager.is_password_valid(username, password):
             user_data: dict = current_app.data_manager.get_user_by_name(username)
             session['username'] = user_data
+            flash(f"Welcome {username}")
+        else:
+            flash("Wrong password or username or both, try again")
+
         return redirect(url_for('list_users'))
 
     except Exception:

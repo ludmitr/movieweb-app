@@ -3,6 +3,7 @@ from .data_manager_interface import DataManagerInterface
 from .data_models_for_sql import Movie, User, Review, db
 import bcrypt
 from datetime import datetime
+import shutil
 
 AVATAR_DEFAULT_NAME = 'avatar_default.png'
 
@@ -309,6 +310,12 @@ class SQLiteDataManager(DataManagerInterface):
             reviews_to_return.append({'user_name': review.user.name, "review": review.review})
 
         return reviews_to_return
+
+    def restore_db_to_default(self):
+        """Replace current sqlite db with default one """
+        db.session.remove()  # This will close the session
+        db.engine.dispose()
+        shutil.copy(config.get_absolute_path_default_db(), config.get_absolute_path_current_db())
 
     def _fetch_movie_data(self, movie: Movie) -> dict:
         """Creates dict from movie instance and returns it"""
