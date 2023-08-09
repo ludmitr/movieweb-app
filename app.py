@@ -29,6 +29,9 @@ def list_users():
         logger.exception("Exception occurred")
         abort(404)
 
+@app.route('/api/faq')
+def api_explain():
+    return render_template('api_explain.html')
 
 @app.errorhandler(404)
 def page_not_found(e):
