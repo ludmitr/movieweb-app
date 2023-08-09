@@ -1,0 +1,30 @@
+<html>
+<head>
+    <title>Movie Reviews</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='review_movie_style.css') }}">
+</head>
+<body>
+<div class="movie-title-container">
+    <form action="{{ url_for('list_users') }}">
+        <button type="submit" class="home-button">Home</button>
+    </form>
+    <h1 class="movie-title">{{ movie.title }}</h1>
+    <div class="single-movie">
+        <a href="{{ movie.imdb_link }}" target="_blank">
+            <img class='movie-poster' src="{{ movie.image_link }}"/>
+        </a>
+        <div class='movie-year'>{{ movie.year }}</div>
+    </div>
+</div>
+<div class="reviews-container">
+    <h2>Reviews</h2>
+    {% for review in movie.reviews %}
+    <div class="review">
+        <h4>by: {{ review.user.name }}</h4>
+        <p>{{ review.review }}</p>
+    </div>
+    {% endfor %}
+</div>
+</body>
+</html>

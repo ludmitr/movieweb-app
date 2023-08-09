@@ -89,6 +89,7 @@ class JSONDataManager(DataManagerInterface):
         if password and len(password) < 6:
             raise ValueError("Password length must be at least 6 characters")
 
+
         users = self.get_all_users()
         # Check if the user name already exists
         for user in users:
@@ -104,7 +105,7 @@ class JSONDataManager(DataManagerInterface):
         }
         # adding password and avatar to the new_user dict
         if password:
-            new_user["password"] = self._encode_hash_and_decode_password(password)
+            new_user["password"] = self._hash_and_encode_password(password)
             if avatar_filename is None or avatar_filename not in os.listdir(
                     'static/images'):
                 avatar_filename = AVATAR_FILE_NAMES['default']
@@ -227,7 +228,7 @@ class JSONDataManager(DataManagerInterface):
         all_users = self.get_all_users()
         return [user for user in all_users if 'password' in user]
 
-        """Check a user's password."""
+        # check users password
         user = self.get_user_by_name(user_name)
         if user and 'password' in user:
             stored_password_hash = user['password'].encode(JSONDataManager.ENCODING_TYPE)  # get the stored password hash
@@ -272,7 +273,7 @@ class JSONDataManager(DataManagerInterface):
 
         return unique_id
 
-    def _encode_hash_and_decode_password(self, password: str) -> str:
+    def _hash_and_encode_password(self, password: str) -> str:
         """Encodes, hashes, and decodes a given password using bcrypt."""
         password_hash = bcrypt.hashpw(password.encode(JSONDataManager.ENCODING_TYPE),
                                       bcrypt.gensalt())

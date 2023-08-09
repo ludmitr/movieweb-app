@@ -1,8 +1,7 @@
 from flask import Blueprint, session, request, abort, redirect, url_for, \
-    render_template, flash
+    render_template, flash, current_app
 from data_managers.omdb_api_data_handler import MovieAPIHandler
 from logging_config.setup_logger import setup_logger
-from config import json_data_manager
 
 user_routes = Blueprint('user_routes', __name__)
 movies_api_handler = MovieAPIHandler()
@@ -17,10 +16,9 @@ def add_user():
         password = request.form.get('password')
         if user_name:
             if password:
-                json_data_manager.add_user(user_name, password=password)
+                current_app.data_manager.add_user(user_name, password=password)
             else:
-                json_data_manager.add_user(user_name)
-
+                current_app.data_manager.add_user(user_name)
         return redirect(url_for('list_users'))
 
     # handling empty string passed or name already exist or password < 6
@@ -41,7 +39,7 @@ def delete_user(user_id):
     """Deleting user if user id match with passed user_id"""
     try:
         user_id = int(user_id)
-        json_data_manager.delete_user(user_id)
+        current_app.data_manager.delete_user(user_id)
         return redirect(url_for('list_users'))
     except Exception:
         logger.exception("Exception occurred")
@@ -68,9 +66,13 @@ def login():
     try:
         username = request.form['username']
         password = request.form['password']
-        if json_data_manager.is_password_valid(username, password):
-            user_data: dict = json_data_manager.get_user_by_name(username)
+        if current_app.data_manager.is_password_valid(username, password):
+            user_data: dict = current_app.data_manager.get_user_by_name(username)
             session['username'] = user_data
+            flash(f"Welcome {username}")
+        else:
+            flash("Wrong password or username or both, try again")
+
         return redirect(url_for('list_users'))
 
     except Exception:

@@ -1,0 +1,41 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+.endpoint {
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin: 20px 0;
+    background-color: #fff;
+}
+
+.endpoint h2 {
+    color: #333;
+    margin-top: 0;
+}
+
+.endpoint h3 {
+    color: #666;
+}
+
+.endpoint code {
+    font-family: "Courier New", monospace;
+    background-color: #f0f0f0;
+    padding: 5px;
+    display: block;
+}
+
+.endpoint pre {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border: 1px solid #ccc;
+}

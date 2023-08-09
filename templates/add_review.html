@@ -1,0 +1,84 @@
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Update Review - MovieWeb App</title>
+        <link rel="stylesheet"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <style>
+            body {
+                background-color: #F5F5F0;
+            }
+            .home-button {
+                position: absolute;
+                left: 20px;
+                top: 20px;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 3px;
+                background-color: rgba(23, 162, 184, 0.5); /* Color from previous container */
+                color: white;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+            .home-button:hover {
+                background-color: rgba(23, 162, 184);
+            }
+            .button-group {
+                display: inline-block;
+            }
+
+
+
+
+
+
+
+
+
+        </style>
+    </head>
+    <body>
+    <div class="container">
+        <form action="{{ url_for('list_users') }}">
+            <button type="submit" class="home-button">Home</button>
+        </form>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <h5 class="text-center text-info mt-5 mb-4">{{ messages[0] }}</h5>
+        {% else %}
+        <h1 class="text-center text-info mt-5 mb-4">Add Review</h1>
+        {% endif %}
+        {% endwith %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <form action="{{ url_for('movie_routes.add_review', user_id=user_id, movie_id=movie_id) }}" method="POST">
+            <div class="form-group">
+                <label>Review</label>
+                <textarea name="review" class="form-control w-100 bg-transparent" required rows="4">{{ review }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary bg-transparent text-primary mt-3 mr-2">Update Review</button>
+        </form>
+        <form action="{{ url_for('movie_routes.delete_review', user_id=user_id, movie_id=movie_id) }}" method="POST" class="d-inline-block mt-3">
+            <button type="submit" class="btn btn-danger bg-transparent text-danger">Delete Review</button>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    </body>
+    </html>
