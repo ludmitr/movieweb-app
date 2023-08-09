@@ -1,0 +1,83 @@
+
+
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='api_explain.css') }}">
+    <title>API Documentation</title>
+</head>
+<body>
+    <header>
+        <h1>RESTful API Documentation</h1>
+    </header>
+    <main>
+        <!-- Manage Users -->
+        <section class="endpoint">
+            <h2>Manage Users (POST, GET)</h2>
+            <p><strong>Endpoint:</strong> <code>/api/users</code></p>
+            <h3>GET:</h3>
+            <p>Returns a JSON array of all users.</p>
+            <h3>POST:</h3>
+            <p>Adds a new user with the provided user name in the JSON payload:</p>
+            <pre><code>{
+    'user_name': 'string'  // Required
+}</code></pre>
+        </section>
+
+        <!-- Delete User by ID -->
+        <section class="endpoint">
+            <h2>Delete User by ID (DELETE)</h2>
+            <p><strong>Endpoint:</strong> <code>/api/users/&lt;user_id&gt;</code></p>
+            <p>Deletes the user with the provided ID.</p>
+        </section>
+
+        <!-- Get User Movies -->
+        <section class="endpoint">
+            <h2>Get User Movies (GET)</h2>
+            <p><strong>Endpoint:</strong> <code>/api/users/&lt;user_id&gt;/movies</code></p>
+            <p>Retrieves movies associated with a specific user.</p>
+        </section>
+
+        <!-- Add Movie to User -->
+        <section class="endpoint">
+            <h2>Add Movie to User (POST)</h2>
+            <p><strong>Endpoint:</strong> <code>/api/users/&lt;user_id&gt;/movies</code></p>
+            <p>Adds a movie to a user's collection using the provided title in the JSON payload:</p>
+            <pre><code>{
+    'title': 'movie_name'  // Required
+}</code></pre>
+        </section>
+
+        <!-- Delete Movie of User -->
+        <section class="endpoint">
+            <h2>Delete Movie of User (DELETE)</h2>
+            <p><strong>Endpoint:</strong> <code>/api/users/&lt;user_id&gt;/movies/&lt;movie_id&gt;</code></p>
+            <p>Deletes the specified movie from the specified user's collection.</p>
+        </section>
+
+        <!-- Review Manager -->
+        <section class="endpoint">
+            <h2>Review Manager (POST, DELETE)</h2>
+            <p><strong>Endpoint:</strong> <code>/api/users/&lt;user_id&gt;/movies/&lt;movie_id&gt;/review</code></p>
+            <h3>DELETE:</h3>
+            <p>Deletes the review for a given movie and user.</p>
+            <h3>POST:</h3>
+            <p>Adds a review to a movie for a specific user, with the provided review in the JSON payload:</p>
+            <pre><code>{
+    'review': 'text'  // Required
+}</code></pre>
+        </section>
+
+        <!-- Get All Reviews for Movie -->
+        <section class="endpoint">
+            <h2>Get All Reviews for Movie (GET)</h2>
+            <p><strong>Endpoint:</strong> <code>/api/movies/&lt;movie_id&gt;/reviews</code></p>
+            <p>Retrieves all reviews for a given movie by its ID.</p>
+        </section>
+    </main>
+</body>
+</html>
+
