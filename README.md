@@ -2,6 +2,8 @@
 
 MovieWeb App is a web application designed to manage movies, users, and reviews. It provides a seamless interface to interact with movie data, manage users, and explore various functionalities related to movies and users.
 
+🚀 Visit the Live Application
+
 ## Table of Contents
 
 - [Features](#features)
