@@ -8,12 +8,17 @@ from blueprint_modules.api.api_routes import api_routes
 from data_managers.omdb_api_data_handler import MovieAPIHandler
 from data_managers.sql_data_manager import SQLiteDataManager
 
-
+# Initialize the Flask application
 app = Flask(__name__)
+
+# Register blueprints for user, movie, and API routes
 app.register_blueprint(user_routes)
 app.register_blueprint(movie_routes)
 app.register_blueprint(api_routes)
+
+# Set the secret key for session management, with a fallback value
 app.secret_key = os.environ.get('SECRET_KEY', 'KAPUT BARTUXA')
+
 app.data_manager = SQLiteDataManager(config.SQL_DB_FILE_NAME, app)
 logger = setup_logger()
 
