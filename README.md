@@ -1,7 +1,3 @@
-Certainly! Based on the analysis of the project, I'll draft a user-friendly and well-styled README file for the `movieweb-app` project. Here's the content:
-
----
-
 # MovieWeb App
 
 MovieWeb App is a web application designed to manage movies, users, and reviews. It provides a seamless interface to interact with movie data, manage users, and explore various functionalities related to movies and users.
